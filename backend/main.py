@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from database.db import database
-from routers import user_router, project_router
+from routers import user_router, project_router, task_router
+from models import user, project, task  # Importa tus modelos aquí
 
 app = FastAPI()
 
@@ -14,6 +15,7 @@ async def shutdown():
 
 app.include_router(user_router.router)
 app.include_router(project_router.router)
+app.include_router(task_router.router)
 
 @app.get("/")
 def read_root():

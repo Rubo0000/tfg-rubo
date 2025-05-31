@@ -28,3 +28,7 @@ async def create_project(project: ProjectIn):
 async def get_projects():
     query = select(Project)
     return await database.fetch_all(query)
+@router.get("/projects/{project_id}")
+async def get_project(project_id: int):
+    query = select(Project).where(Project.id == project_id)
+    return await database.fetch_all(query)

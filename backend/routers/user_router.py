@@ -24,3 +24,8 @@ async def create_user(user: UserIn):
 async def get_users():
     query = select(User)
     return await database.fetch_all(query)
+@router.get("/users/{user_id}")
+async def get_user(user_id: int):
+    query = select(User).where(User.id == user_id)
+    return await database.fetch_all(query)
+    
