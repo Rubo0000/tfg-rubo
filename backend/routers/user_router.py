@@ -27,5 +27,5 @@ async def get_users():
 @router.get("/users/{user_id}")
 async def get_user(user_id: int):
     query = select(User).where(User.id == user_id)
-    return await database.fetch_all(query)
+    return await database.fetch_one(query)
     

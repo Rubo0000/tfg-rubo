@@ -50,7 +50,7 @@ async def get_tasks():
 @router.get("/tasks/{task_id}")
 async def get_task(task_id: int):
     query = select(Task).where(Task.id == task_id)
-    return await database.fetch_all(query)
+    return await database.fetch_one(query)
 @router.get("/tasks/by_project/{project_id}")
 async def get_tasks_by_project(project_id: int):
     query = select(Task).where(Task.project_id == project_id)

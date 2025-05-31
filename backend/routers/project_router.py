@@ -31,4 +31,4 @@ async def get_projects():
 @router.get("/projects/{project_id}")
 async def get_project(project_id: int):
     query = select(Project).where(Project.id == project_id)
-    return await database.fetch_all(query)
+    return await database.fetch_one(query)
