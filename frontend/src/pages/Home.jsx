@@ -1,8 +1,9 @@
-import { Box, Container, Stack, Button } from "@mui/material";
+import { Box, Container, Stack } from "@mui/material";
 import Header from "../components/Header";
 import HeroSection from "../components/HeroSection";
 import Feature from "../components/Feature";
 import Footer from "../components/Footer";
+import AuthButtons from "../components/AuthButtons";
 import GestionDeTareas from "../assets/GestionDeTareas.png";
 import SeguimientoDelProgreso from "../assets/SeguimientoDelProgeso.png";
 import SupervisionDocente from "../assets/SupervisionDocente.png";
@@ -18,7 +19,6 @@ function Home() {
           justifyContent="center"
           spacing={6}
         >
-          {/* Hero image más grande */}
           <Box
             sx={{
               flexShrink: 0,
@@ -32,7 +32,6 @@ function Home() {
             <HeroSection />
           </Box>
 
-          {/* Features + Botones a la derecha */}
           <Box>
             <Stack direction="row" spacing={4} alignItems="flex-start">
               <Feature
@@ -55,43 +54,7 @@ function Home() {
               />
             </Stack>
 
-            {/* Botones debajo, alineados a la derecha */}
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "flex-end",
-                gap: 4,
-                mt: 4,
-              }}
-            >
-              <Button
-                variant="contained"
-                sx={{
-                  px: 4,
-                  py: 1.5,
-                  background: "linear-gradient(to right, #f6d365, #fda085)",
-                  color: "black",
-                  fontWeight: "bold",
-                  "&:hover": { opacity: 0.9 },
-                }}
-              >
-                INICIO SESIÓN
-              </Button>
-              <Button
-                variant="contained"
-                sx={{
-                  px: 4,
-                  py: 1.5,
-                  background: "linear-gradient(to right, #74ebd5, #9face6)",
-                  color: "black",
-                  marginRight: 15,
-                  fontWeight: "bold",
-                  "&:hover": { opacity: 0.9 },
-                }}
-              >
-                REGISTRO
-              </Button>
-            </Box>
+            <AuthButtons />
           </Box>
         </Stack>
       </Container>
