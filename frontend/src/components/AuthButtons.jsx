@@ -2,6 +2,7 @@
 
 import { Box, Button } from "@mui/material";
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 
 const MotionBox = motion(Box);
 
@@ -27,6 +28,8 @@ function AuthButtons() {
         sx={{ borderRadius: 2 }}
       >
         <Button
+          component={Link}
+          to="/login"
           variant="contained"
           sx={{
             px: 4,
@@ -51,6 +54,8 @@ function AuthButtons() {
         sx={{ borderRadius: 2, mr: 27.5 }}
       >
         <Button
+          component={Link}
+          to="/registro"
           variant="contained"
           sx={{
             px: 4,

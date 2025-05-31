@@ -14,7 +14,7 @@ function Feature({ icon, title, description, imgSrc }) {
         transition: { duration: 0.5, ease: "easeOut" }, // Transición hover
       }}
       sx={{
-        width: 220,
+        width: 225,
         height: 300,
         p: 2,
         borderRadius: 2,
