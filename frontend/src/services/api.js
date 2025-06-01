@@ -1,0 +1,25 @@
+// services/api.js
+
+import axios from 'axios';
+
+const API_BASE_URL = 'http://localhost:8000'; // Asegúrate de que esta URL coincida con la de tu backend
+
+export const fetchProjects = async () => {
+    const response = await axios.get(`${API_BASE_URL}/projects`);
+    return response.data;
+};
+
+export const fetchTasks = async () => {
+    const response = await axios.get(`${API_BASE_URL}/tasks`);
+    return response.data;
+};
+
+export const fetchTasksByProject = async (projectId) => {
+    const response = await axios.get(`${API_BASE_URL}/tasks/by_project/${projectId}`);
+    return response.data;
+};
+
+export const fetchTasksByUser = async (userId) => {
+    const response = await axios.get(`${API_BASE_URL}/tasks/by_user/${userId}`);
+    return response.data;
+};

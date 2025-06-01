@@ -1,3 +1,5 @@
+// components/Dashboard.js
+
 import {
   Box,
   Typography,
@@ -10,20 +12,65 @@ import { Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ProjectStats from "../components/ProjectStats";
+import { fetchProjects, fetchTasksByProject } from "../services/api";
 
 function Dashboard() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [projects, setProjects] = useState([]);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [projectStats, setProjectStats] = useState({
+    totalTasks: 0,
+    completedTasks: 0,
+    userTasks: 0,
+    recentActivity: [],
+  });
 
   useEffect(() => {
-    setProjects([
-      { id: 1, name: "Proyecto TFG" },
-      { id: 2, name: "Hackathon IA" },
-      { id: 3, name: "Trabajo Grupal" },
-    ]);
+    const loadProjects = async () => {
+      try {
+        const data = await fetchProjects();
+        setProjects(data);
+        if (data.length > 0) {
+          setSelectedProjectId(data[0].id);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      }
+    };
+
+    loadProjects();
   }, []);
+
+  useEffect(() => {
+    const loadProjectStats = async () => {
+      if (selectedProjectId) {
+        try {
+          const tasks = await fetchTasksByProject(selectedProjectId);
+          const totalTasks = tasks.length;
+          const completedTasks = tasks.filter(task => task.status === 'completada').length;
+          const userId = 1; // Reemplaza con el ID del usuario actual
+          const userTasks = tasks.filter(task => task.assigned_to === userId).length;
+          const recentActivity = tasks
+            .sort((a, b) => new Date(b.due_date) - new Date(a.due_date))
+            .slice(0, 5)
+            .map(task => `Tarea '${task.title}' con estado '${task.status}'`);
+
+          setProjectStats({
+            totalTasks,
+            completedTasks,
+            userTasks,
+            recentActivity,
+          });
+        } catch (error) {
+          console.error("Error fetching project stats:", error);
+        }
+      }
+    };
+
+    loadProjectStats();
+  }, [selectedProjectId]);
 
   const handleCreateProject = () => {
     console.log("Redirigir o abrir modal para crear nuevo proyecto");
@@ -63,6 +110,7 @@ function Dashboard() {
                 justifyContent: "center",
                 cursor: "pointer",
               }}
+              onClick={() => setSelectedProjectId(project.id)}
             >
               {project.name}
             </Paper>
@@ -100,18 +148,18 @@ function Dashboard() {
             <Add sx={{ fontSize: 40, mb: 1 }} />
             Crear nuevo proyecto
           </Paper>
-          <ProjectStats
-            totalTasks={12}
-            completedTasks={8}
-            userTasks={3}
-            recentActivity={[
-              "Rubén completó 'Integrar login'",
-              "María subió archivo a 'Informe final'",
-              "Se añadió tarea 'Revisar código'",
-            ]}
-          />
         </Grid>
       </Grid>
+
+      {/* Mostrar estadísticas del proyecto seleccionado */}
+      {selectedProjectId && (
+        <ProjectStats
+          totalTasks={projectStats.totalTasks}
+          completedTasks={projectStats.completedTasks}
+          userTasks={projectStats.userTasks}
+          recentActivity={projectStats.recentActivity}
+        />
+      )}
     </Box>
   );
 }
