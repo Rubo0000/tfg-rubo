@@ -12,7 +12,7 @@ import { Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ProjectStats from "../components/ProjectStats";
-import { fetchProjects, fetchTasksByProject } from "../services/api";
+import { fetchProjects, fetchTasksByProject, fetchProjectsByUser } from "../services/api";
 
 function Dashboard() {
   const theme = useTheme();
@@ -30,13 +30,14 @@ function Dashboard() {
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const data = await fetchProjects();
+        const currentUserId = 20; // TODO: reemplaza con userId real de sesión
+        const data = await fetchProjectsByUser(currentUserId);
         setProjects(data);
         if (data.length > 0) {
           setSelectedProjectId(data[0].id);
         }
       } catch (error) {
-        console.error("Error fetching projects:", error);
+        console.error("Error fetching user's projects:", error);
       }
     };
 

@@ -23,3 +23,7 @@ export const fetchTasksByUser = async (userId) => {
     const response = await axios.get(`${API_BASE_URL}/tasks/by_user/${userId}`);
     return response.data;
 };
+export const fetchProjectsByUser = async (userId) => {
+    const response = await axios.get(`http://localhost:8000/projects/by_user/${userId}`);
+    return response.data;
+};
