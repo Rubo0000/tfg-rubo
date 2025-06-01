@@ -21,11 +21,25 @@ async def login(data: LoginInput):
         raise HTTPException(status_code=401, detail="Credenciales incorrectas")
     
     token = create_access_token(data={"sub": user.email})
-    return {"access_token": token}
-
+    return {
+            "access_token": token,
+            "user_id":user.id,
+        }
 
 @router.post("/logout")
 async def logout():
-    # Aquí podrías implementar la lógica de cierre de sesión, como invalidar el token.
-    # En este caso, simplemente retornamos un mensaje de éxito.
+    # No hay lógica real si estás usando JWT sin blacklist
     return {"message": "Sesión cerrada con éxito"}
+@router.get("/me")
+async def get_current_user(user_id: int):
+    query = select(User).where(User.id == user_id)
+    user = await database.fetch_one(query)
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    return {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email
+    }

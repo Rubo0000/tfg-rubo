@@ -7,17 +7,19 @@ import {
   Paper,
   useTheme,
   useMediaQuery,
+  Button,
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ProjectStats from "../components/ProjectStats";
 import { fetchProjects, fetchTasksByProject, fetchProjectsByUser } from "../services/api";
+import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-
+  const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [projectStats, setProjectStats] = useState({
@@ -30,7 +32,7 @@ function Dashboard() {
   useEffect(() => {
     const loadProjects = async () => {
       try {
-        const currentUserId = 20; // TODO: reemplaza con userId real de sesión
+        const currentUserId = parseInt(localStorage.getItem("userId"));
         const data = await fetchProjectsByUser(currentUserId);
         setProjects(data);
         if (data.length > 0) {
@@ -77,12 +79,32 @@ function Dashboard() {
     console.log("Redirigir o abrir modal para crear nuevo proyecto");
   };
 
+
+
+  const handleLogout = async () => {
+    try {
+      await axios.post("http://localhost:8000/logout");
+    } catch (err) {
+      console.warn("Logout local, sin respuesta del servidor");
+    }
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    navigate("/login");
+  };
+
   return (
     <Box sx={{ px: 4, py: 6 }}>
       <Typography variant="h4" fontWeight="bold" gutterBottom>
         ¡Bienvenido de nuevo! <span role="img">👋</span>
       </Typography>
-
+      <Button
+        variant="outlined"
+        color="error"
+        onClick={handleLogout}
+        sx={{ textTransform: "none", fontWeight: "bold" }}
+      >
+        Cerrar sesión
+      </Button>
       <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
         {projects.length > 0
           ? "Estos son tus proyectos actuales:"
