@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import Registro from "./pages/Registro";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
+import ProjectDashboard from "./components/ProjectDashboard";
 
 function App() {
   const user = localStorage.getItem("user");
@@ -12,6 +13,8 @@ function App() {
       <Route path="/" element={<Home />} />
       <Route path="/registro" element={<Registro />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/dashboard" element={<Dashboard />} />
+      <Route path="/proyecto/:id" element={<ProjectDashboard />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );
