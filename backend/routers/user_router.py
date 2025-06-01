@@ -3,6 +3,7 @@ from database.db import database
 from models.user import User
 from sqlalchemy import insert, select
 from pydantic import BaseModel
+from auth import hash_password
 
 router = APIRouter()
 
@@ -11,9 +12,16 @@ class UserIn(BaseModel):
     email: str
     password: str
 
+
 @router.post("/users")
 async def create_user(user: UserIn):
-    query = insert(User).values(name=user.name, email=user.email, password=user.password)
+    hashed_pwd = hash_password(user.password)  # 🔐 aquí se aplica bcrypt
+    query = insert(User).values(
+        name=user.name,
+        email=user.email,
+        password=hashed_pwd
+    )
+    print(hashed_pwd)
     try:
         await database.execute(query)
         return {"message": "Usuario creado con éxito"}

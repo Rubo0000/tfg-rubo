@@ -30,12 +30,13 @@ export default function Login() {
     try {
       const res = await fetch("http://localhost:8000/login", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           username: form.email,
           password: form.password,
         }),
       });
+
 
       if (res.ok) {
         const data = await res.json();
