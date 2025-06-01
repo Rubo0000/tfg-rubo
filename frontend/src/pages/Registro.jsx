@@ -67,7 +67,7 @@ export default function Registro() {
 
   return (
     <Container maxWidth="sm" sx={{ mt: 10 }}>
-      <Paper elevation={6} sx={{ p: 5, borderRadius: 4 }}>
+      <Paper elevation={6} sx={{ p: 5, borderRadius: 8 }}>
         <Stack spacing={2} alignItems="center" sx={{ mb: 3 }}>
           <Avatar sx={{ bgcolor: "#1976d2", width: 56, height: 56 }}>
             <PersonAddAltIcon />
@@ -84,6 +84,7 @@ export default function Registro() {
 
         <Box
           component="form"
+
           onSubmit={handleSubmit}
           sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
@@ -94,6 +95,7 @@ export default function Registro() {
             fullWidth
             onChange={handleChange}
             required
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
           <TextField
             label="Email institucional"
@@ -103,6 +105,7 @@ export default function Registro() {
             fullWidth
             onChange={handleChange}
             required
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
           <TextField
             label="Contraseña"
@@ -112,6 +115,7 @@ export default function Registro() {
             fullWidth
             onChange={handleChange}
             required
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
           <TextField
             label="Confirmar contraseña"
@@ -121,6 +125,7 @@ export default function Registro() {
             fullWidth
             onChange={handleChange}
             required
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
           <Button
             type="submit"
@@ -129,6 +134,7 @@ export default function Registro() {
             fullWidth
             sx={{
               mt: 1,
+              borderRadius: 5,
               background: "linear-gradient(to right, #74ebd5, #9face6)",
               fontWeight: "bold",
               color: "#000",
