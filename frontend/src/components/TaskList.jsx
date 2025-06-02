@@ -14,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import WarningAmberIcon from "@mui/icons-material/WarningAmber";
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
 import { deleteTask } from "../services/api";
-
+import { useNavigate } from "react-router-dom";
 const statusColors = {
     "pendiente": "default",
     "en progreso": "info",
@@ -26,7 +26,6 @@ const priorityColors = {
     "media": "warning",
     "baja": "success",
 };
-
 const getUrgency = (dueDateStr) => {
     if (!dueDateStr) return "normal";
     const today = new Date();
@@ -46,8 +45,9 @@ const TaskCard = ({ task, onEdit, onDelete, userMap }) => {
         urgency === "overdue" ? "error.main" :
             urgency === "upcoming" ? "warning.main" : "text.secondary";
 
+    const navigate = useNavigate();
     return (
-        <Paper elevation={3} sx={{ p: 2, borderRadius: 2, border: `2px solid ${borderColor}` }}>
+        <Paper elevation={3} onClick={() => navigate(`/tasks/${task.id}`)} sx={{ p: 2, borderRadius: 2, border: `2px solid ${borderColor}`, cursor: "pointer", height: "100%" }}>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
                 <Typography variant="h6" fontWeight="bold">{task.title}</Typography>
                 <Box>
