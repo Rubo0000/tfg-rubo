@@ -1,58 +1,56 @@
+// hooks/useProjectStats.js
 import { useState, useEffect } from "react";
-import { fetchTasksByProject } from "../services/api";
-
-const COMPLETED_STATUSES = ["completada", "finalizada", "cerrada"];
-
-const isTaskCompleted = (status) =>
-    COMPLETED_STATUSES.includes(status?.toLowerCase().trim());
+import { fetchTasksByProject, fetchUserById } from "../services/api";
 
 export const useProjectStats = (projectId) => {
     const [stats, setStats] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        if (!projectId) return;
-
         const fetch = async () => {
-            setLoading(true);
-            setError(null);
-
             try {
                 const tasks = await fetchTasksByProject(projectId);
                 const userId = parseInt(localStorage.getItem("userId"));
+                const isCompleted = status => ["completada", "finalizada"].includes(status);
 
-                const totalTasks = tasks.length;
-                const completedTasks = tasks.filter((t) => isTaskCompleted(t.status)).length;
-                const userTasks = tasks.filter((t) => t.assigned_to === userId).length;
+                // Obtener IDs únicos de usuarios asignados
+                const assignedUserIds = [...new Set(tasks.map(t => t.assigned_to).filter(Boolean))];
 
+                // Obtener nombres de usuarios
+                const userNamesMap = {};
+                await Promise.all(
+                    assignedUserIds.map(async (id) => {
+                        const user = await fetchUserById(id);
+                        userNamesMap[id] = user.name;
+                    })
+                );
+
+                // Calcular contribuciones
                 const contributions = tasks.reduce((acc, t) => {
                     if (!t.assigned_to) return acc;
-                    const key = `Usuario ${t.assigned_to}`;
-                    acc[key] = (acc[key] || 0) + (isTaskCompleted(t.status) ? 1 : 0);
+                    const key = userNamesMap[t.assigned_to] || `Usuario ${t.assigned_to}`;
+                    acc[key] = (acc[key] || 0) + (isCompleted(t.status) ? 1 : 0);
                     return acc;
                 }, {});
 
-                const recentActivity = tasks
-                    .sort((a, b) => new Date(b.due_date) - new Date(a.due_date))
-                    .slice(0, 5)
-                    .map((task) => `Tarea '${task.title}' con estado '${task.status}'`);
-
                 setStats({
-                    totalTasks,
-                    completedTasks,
-                    userTasks,
-                    contributions,
-                    recentActivity,
+                    totalTasks: tasks.length,
+                    completedTasks: tasks.filter(t => isCompleted(t.status)).length,
+                    userTasks: tasks.filter(t => t.assigned_to === userId).length,
+                    recentActivity: tasks
+                        .sort((a, b) => new Date(b.due_date) - new Date(a.due_date))
+                        .slice(0, 5)
+                        .map(task => `Tarea '${task.title}' con estado '${task.status}'`),
+                    contributions
                 });
             } catch (err) {
-                console.error("Error en useProjectStats:", err);
-                setError("Error al cargar estadísticas del proyecto.");
+                setError("No se pudieron cargar las estadísticas del proyecto.");
+                console.error(err);
             } finally {
                 setLoading(false);
             }
         };
-
         fetch();
     }, [projectId]);
 
