@@ -20,7 +20,7 @@ function ProjectDashboard() {
     const [selectedTask, setSelectedTask] = useState(null);
 
     const projectStats = useProjectStats(projectId) || {};
-    const { stats, loading, error: statsError } = projectStats;
+    const { stats, loading, error: statsError, refetchStats } = useProjectStats(projectId);
 
     const loadTasks = async () => {
         const data = await fetchTasksByProject(projectId);
@@ -78,7 +78,10 @@ function ProjectDashboard() {
 
             <TaskList
                 tasks={tasks}
-                onTaskUpdate={loadTasks}
+                onTaskUpdate={async () => {
+                    await loadTasks();
+                    await refetchStats(); // ← ¡actualiza las estadísticas!
+                }}
                 setTaskModalOpen={setTaskModalOpen}
                 setSelectedTask={setSelectedTask}
             />
@@ -121,6 +124,7 @@ function ProjectDashboard() {
                             await createTask(data);
                         }
                         await loadTasks();
+                        await refetchStats(); // ← ¡aquí también!
                     } catch (err) {
                         console.error("Error al guardar tarea:", err);
                     }
@@ -128,6 +132,7 @@ function ProjectDashboard() {
                 projectId={parseInt(projectId)}
                 initialData={selectedTask}
             />
+
 
 
         </Box>

@@ -12,7 +12,7 @@ import {
 import { useState } from "react";
 
 const priorities = ["alta", "media", "baja"];
-const statuses = ["pendiente", "en_progreso", "finalizada"];
+const statuses = ["pendiente", "en progreso", "finalizada"];
 
 const CreateTaskModal = ({ open, onClose, onCreate, projectId }) => {
     const [form, setForm] = useState({
