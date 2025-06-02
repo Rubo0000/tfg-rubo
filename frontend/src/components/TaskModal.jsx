@@ -46,8 +46,11 @@ const TaskModal = ({ open, onClose, onSubmit, projectId, initialData = null }) =
             ...form,
             project_id: projectId,
             assigned_to: form.assigned_to ? parseInt(form.assigned_to) : null,
+            due_date: form.due_date === "" ? null : form.due_date, // <- FIX
         };
+
         onSubmit(payload);
+
         setForm({
             title: "",
             description: "",
@@ -56,8 +59,10 @@ const TaskModal = ({ open, onClose, onSubmit, projectId, initialData = null }) =
             status: "pendiente",
             assigned_to: "",
         });
+
         onClose();
     };
+
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
