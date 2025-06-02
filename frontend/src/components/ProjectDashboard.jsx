@@ -1,82 +1,64 @@
-import { Box, Typography, Grid, Paper } from "@mui/material";
-import { Pie, Bar } from "react-chartjs-2";
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from "chart.js";
-
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+import { Box, Typography, CircularProgress, Alert } from "@mui/material";
+import { useParams } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { fetchProjectById } from "../services/api";
+import { useProjectStats } from "../hooks/useProjectStats";
+import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
+import ProjectStats from "../components/ProjectStats";
+import ProjectOverview from "../components/ProjectOverview";
 
 function ProjectDashboard() {
-    // Simulación de datos (estos deberían venir de la API)
-    const totalTasks = 12;
-    const completedTasks = 8;
-    const pendingTasks = totalTasks - completedTasks;
+    const { projectId } = useParams();
+    const [project, setProject] = useState(null);
+    const [error, setError] = useState("");
 
-    const contributions = {
-        Rubén: 5,
-        María: 3,
-        Juan: 4,
-    };
+    const projectStats = useProjectStats(projectId) || {};
+    const { stats, loading, error: statsError } = projectStats;
 
-    const recentActivity = [
-        "Rubén completó 'Frontend Auth'",
-        "Juan editó 'Backend API'",
-        "María añadió 'Documentación'",
-    ];
+    useEffect(() => {
+        const loadProject = async () => {
+            try {
+                const data = await fetchProjectById(projectId);
+                setProject(data);
+            } catch (err) {
+                setError("No se pudo cargar el proyecto.");
+                console.error(err);
+            }
+        };
+        loadProject();
+    }, [projectId]);
 
-    const pieData = {
-        labels: ["Completadas", "Pendientes"],
-        datasets: [
-            {
-                label: "Estado de tareas",
-                data: [completedTasks, pendingTasks],
-                backgroundColor: ["#4caf50", "#ffc107"],
-                borderWidth: 1,
-            },
-        ],
-    };
+    if (error || statsError) {
+        return <Alert severity="error">{error || statsError}</Alert>;
+    }
 
-    const barData = {
-        labels: Object.keys(contributions),
-        datasets: [
-            {
-                label: "Tareas completadas",
-                data: Object.values(contributions),
-                backgroundColor: "#2196f3",
-            },
-        ],
-    };
+    if (!project || loading || !stats) {
+        return (
+            <Box sx={{ px: 4, py: 6 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     return (
         <Box sx={{ px: 4, py: 6 }}>
-            <Typography variant="h4" fontWeight="bold" gutterBottom>
-                Dashboard: Proyecto TFG
-            </Typography>
+            <ProjectDetailsHeader name={project.name} description={project.description} />
 
-            <Grid container spacing={4}>
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 3, borderRadius: 3 }}>
-                        <Typography variant="h6" gutterBottom>Progreso de tareas</Typography>
-                        <Pie data={pieData} />
-                    </Paper>
-                </Grid>
+            <ProjectStats
+                totalTasks={stats.totalTasks}
+                completedTasks={stats.completedTasks}
+                userTasks={stats.userTasks}
+                recentActivity={stats.recentActivity}
+            />
 
-                <Grid item xs={12} md={6}>
-                    <Paper sx={{ p: 3, borderRadius: 3 }}>
-                        <Typography variant="h6" gutterBottom>Contribuciones por usuario</Typography>
-                        <Bar data={barData} />
-                    </Paper>
-                </Grid>
-
-                <Grid item xs={12}>
-                    <Paper sx={{ p: 3, borderRadius: 3 }}>
-                        <Typography variant="h6" gutterBottom>Actividad reciente</Typography>
-                        {recentActivity.map((entry, index) => (
-                            <Typography key={index} variant="body2" sx={{ mb: 1 }}>
-                                • {entry}
-                            </Typography>
-                        ))}
-                    </Paper>
-                </Grid>
-            </Grid>
+            <Box sx={{ mt: 6 }}>
+                <ProjectOverview
+                    completedTasks={stats.completedTasks}
+                    totalTasks={stats.totalTasks}
+                    contributions={stats.contributions}
+                    recentActivity={stats.recentActivity}
+                />
+            </Box>
         </Box>
     );
 }

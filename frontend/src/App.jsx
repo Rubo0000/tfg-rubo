@@ -14,7 +14,7 @@ function App() {
       <Route path="/registro" element={<Registro />} />
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/proyecto/:id" element={<ProjectDashboard />} />
+      <Route path="/projects/:projectId" element={<ProjectDashboard />} />
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
   );

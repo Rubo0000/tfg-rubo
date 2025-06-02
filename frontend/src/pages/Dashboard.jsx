@@ -52,7 +52,7 @@ function Dashboard() {
         try {
           const tasks = await fetchTasksByProject(selectedProjectId);
           const totalTasks = tasks.length;
-          const completedTasks = tasks.filter(task => task.status === 'completada').length;
+          const completedTasks = tasks.filter(task => task.status === 'finalizada').length;
           const userId = 1; // Reemplaza con el ID del usuario actual
           const userTasks = tasks.filter(task => task.assigned_to === userId).length;
           const recentActivity = tasks
@@ -133,7 +133,8 @@ function Dashboard() {
                 justifyContent: "center",
                 cursor: "pointer",
               }}
-              onClick={() => setSelectedProjectId(project.id)}
+              onClick={() => navigate(`/projects/${project.id}`)}
+
             >
               {project.name}
             </Paper>
