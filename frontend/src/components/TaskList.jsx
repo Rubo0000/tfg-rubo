@@ -26,7 +26,18 @@ const priorityColors = {
     "baja": "success",
 };
 
-const TaskList = ({ tasks = [], onTaskUpdate, setTaskModalOpen, setSelectedTask }) => {
+const TaskList = ({
+    tasks = [],
+    onTaskUpdate,
+    setTaskModalOpen,
+    setSelectedTask,
+    statusFilter,
+    priorityFilter,
+    onlyMine,
+    userId
+}) => {
+
+
     const handleDeleteClick = async (taskId) => {
         try {
             await deleteTask(taskId);
@@ -44,10 +55,17 @@ const TaskList = ({ tasks = [], onTaskUpdate, setTaskModalOpen, setSelectedTask 
         );
     }
 
+    const filteredTasks = tasks?.filter(task =>
+        (!statusFilter || task.status === statusFilter) &&
+        (!priorityFilter || task.priority === priorityFilter) &&
+        (!onlyMine || task.assigned_to === userId)
+    ) || [];
+
+
     return (
         <Box sx={{ mb: 6 }}>
             <Grid container spacing={2}>
-                {tasks.map((task) => (
+                {filteredTasks.map((task) => (
                     <Grid item xs={12} sm={6} md={4} key={task.id}>
                         <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">

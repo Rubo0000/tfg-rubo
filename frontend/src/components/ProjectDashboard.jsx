@@ -10,7 +10,7 @@ import TaskModal from "../components/TaskModal";
 import { updateTask } from "../services/api";
 import { createTask, fetchTasksByProject } from "../services/api"; // ya deberías tener esto
 import TaskList from "../components/TaskList";
-
+import TaskFilters from "../components/TaskFilters"; // Asegúrate de tener este componente
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
@@ -18,7 +18,10 @@ function ProjectDashboard() {
     const [taskModalOpen, setTaskModalOpen] = useState(false);
     const [tasks, setTasks] = useState(null);
     const [selectedTask, setSelectedTask] = useState(null);
-
+    const [statusFilter, setStatusFilter] = useState(null);
+    const [priorityFilter, setPriorityFilter] = useState(null);
+    const [onlyMine, setOnlyMine] = useState(false);
+    const userId = parseInt(localStorage.getItem("userId"));
     const projectStats = useProjectStats(projectId) || {};
     const { stats, loading, error: statsError, refetchStats } = useProjectStats(projectId);
 
@@ -65,7 +68,7 @@ function ProjectDashboard() {
     const handleTaskCreate = async (taskData) => {
         try {
             await createTask(taskData);
-            window.location.reload(); // o puedes actualizar useProjectStats si prefieres
+            window.location.reload();
         } catch (err) {
             console.error("Error al crear tarea:", err);
         }
@@ -75,15 +78,27 @@ function ProjectDashboard() {
         <Box sx={{ px: 4, py: 6 }}>
             <ProjectDetailsHeader name={project.name} description={project.description} />
 
+            <TaskFilters
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                priorityFilter={priorityFilter}
+                setPriorityFilter={setPriorityFilter}
+                onlyMine={onlyMine}
+                setOnlyMine={setOnlyMine}
+                userId={userId}
+            />
+
 
             <TaskList
                 tasks={tasks}
                 onTaskUpdate={async () => {
                     await loadTasks();
-                    await refetchStats(); // ← ¡actualiza las estadísticas!
+                    await refetchStats();
                 }}
                 setTaskModalOpen={setTaskModalOpen}
                 setSelectedTask={setSelectedTask}
+                statusFilter={statusFilter}
+                priorityFilter={priorityFilter}
             />
 
             <Button
