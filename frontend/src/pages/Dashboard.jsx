@@ -13,8 +13,9 @@ import { Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import ProjectStats from "../components/ProjectStats";
-import { fetchProjects, fetchTasksByProject, fetchProjectsByUser } from "../services/api";
+import { fetchProjects, fetchTasksByProject, fetchProjectsByUser, createProject } from "../services/api";
 import { useNavigate } from "react-router-dom";
+import CreateProjectModal from "../components/CreateProjectModal";
 
 function Dashboard() {
   const theme = useTheme();
@@ -22,6 +23,7 @@ function Dashboard() {
   const navigate = useNavigate();
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [projectStats, setProjectStats] = useState({
     totalTasks: 0,
     completedTasks: 0,
@@ -76,8 +78,20 @@ function Dashboard() {
   }, [selectedProjectId]);
 
   const handleCreateProject = () => {
-    console.log("Redirigir o abrir modal para crear nuevo proyecto");
+    setModalOpen(true);
   };
+
+  const handleProjectSubmit = async (data) => {
+    try {
+      await createProject(data);
+      const userId = parseInt(localStorage.getItem("userId"));
+      const updatedProjects = await fetchProjectsByUser(userId);
+      setProjects(updatedProjects);
+    } catch (err) {
+      console.error("Error al crear el proyecto:", err);
+    }
+  };
+
 
 
 
@@ -183,8 +197,14 @@ function Dashboard() {
           userTasks={projectStats.userTasks}
           recentActivity={projectStats.recentActivity}
         />
-      )}
+      )}<CreateProjectModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onCreate={handleProjectSubmit}
+      />
+
     </Box>
+
   );
 }
 
