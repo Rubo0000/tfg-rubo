@@ -7,11 +7,24 @@ import {
     Grid,
     Divider,
     Stack,
-    Tooltip
+    Tooltip,
+    Chip
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteTask } from "../services/api";
+
+const statusColors = {
+    "pendiente": "default",
+    "en progreso": "info",
+    "finalizada": "success",
+};
+
+const priorityColors = {
+    "alta": "error",
+    "media": "warning",
+    "baja": "success",
+};
 
 const TaskList = ({ tasks = [], onTaskUpdate, setTaskModalOpen, setSelectedTask }) => {
     const handleDeleteClick = async (taskId) => {
@@ -38,7 +51,7 @@ const TaskList = ({ tasks = [], onTaskUpdate, setTaskModalOpen, setSelectedTask 
                     <Grid item xs={12} sm={6} md={4} key={task.id}>
                         <Paper elevation={3} sx={{ p: 2, borderRadius: 2 }}>
                             <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
+                                <Typography variant="h6" fontWeight="bold">
                                     {task.title}
                                 </Typography>
                                 <Box>
@@ -64,17 +77,15 @@ const TaskList = ({ tasks = [], onTaskUpdate, setTaskModalOpen, setSelectedTask 
                                 </Box>
                             </Stack>
 
-                            {task.description && (
-                                <Typography variant="body2" sx={{ mt: 1 }}>
-                                    {task.description}
-                                </Typography>
-                            )}
-
-                            <Divider sx={{ my: 1.5 }} />
-
-                            <Typography variant="caption">
-                                Estado: <strong>{task.status}</strong> | Prioridad: <strong>{task.priority}</strong>
+                            <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>
+                                {task.description}
                             </Typography>
+
+                            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
+                                <Chip label={task.priority} color={priorityColors[task.priority]} size="small" />
+                                <Chip label={task.status} color={statusColors[task.status]} size="small" />
+                            </Stack>
+
                             <Typography variant="caption" display="block">
                                 Fecha: {task.due_date || "Sin fecha"}
                             </Typography>
