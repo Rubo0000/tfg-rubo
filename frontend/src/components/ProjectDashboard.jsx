@@ -6,17 +6,35 @@ import { useProjectStats } from "../hooks/useProjectStats";
 import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
 import ProjectStats from "../components/ProjectStats";
 import ProjectOverview from "../components/ProjectOverview";
-import CreateTaskModal from "../components/CreateTaskModal";
+import TaskModal from "../components/TaskModal";
+import { updateTask } from "../services/api";
 import { createTask, fetchTasksByProject } from "../services/api"; // ya deberías tener esto
+import TaskList from "../components/TaskList";
 
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
     const [error, setError] = useState("");
     const [taskModalOpen, setTaskModalOpen] = useState(false);
+    const [tasks, setTasks] = useState(null);
+    const [selectedTask, setSelectedTask] = useState(null);
 
     const projectStats = useProjectStats(projectId) || {};
     const { stats, loading, error: statsError } = projectStats;
+
+    const loadTasks = async () => {
+        const data = await fetchTasksByProject(projectId);
+        setTasks(data);
+    };
+
+    useEffect(() => {
+        const loadTasks = async () => {
+            const data = await fetchTasksByProject(projectId);
+            setTasks(data);
+        };
+        loadTasks();
+    }, [projectId]);
+
 
     useEffect(() => {
         const loadProject = async () => {
@@ -65,6 +83,14 @@ function ProjectDashboard() {
                 ➕ Crear nueva tarea
             </Button>
 
+            <TaskList
+                tasks={tasks}
+                onTaskUpdate={loadTasks}
+                setTaskModalOpen={setTaskModalOpen}
+                setSelectedTask={setSelectedTask}
+            />
+
+
             <ProjectStats
                 totalTasks={stats.totalTasks}
                 completedTasks={stats.completedTasks}
@@ -79,13 +105,30 @@ function ProjectDashboard() {
                     contributions={stats.contributions}
                     recentActivity={stats.recentActivity}
                 />
+
             </Box>
-            <CreateTaskModal
+            <TaskModal
                 open={taskModalOpen}
-                onClose={() => setTaskModalOpen(false)}
-                onCreate={handleTaskCreate}
+                onClose={() => {
+                    setTaskModalOpen(false);
+                    setSelectedTask(null);
+                }}
+                onSubmit={async (data) => {
+                    try {
+                        if (selectedTask) {
+                            await updateTask(selectedTask.id, data);
+                        } else {
+                            await createTask(data);
+                        }
+                        await loadTasks();
+                    } catch (err) {
+                        console.error("Error al guardar tarea:", err);
+                    }
+                }}
                 projectId={parseInt(projectId)}
+                initialData={selectedTask}
             />
+
 
         </Box>
     );
