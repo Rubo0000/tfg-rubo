@@ -37,10 +37,11 @@ export const fetchUserById = async (userId) => {
     const response = await axios.get(`${API_BASE_URL}/users/${userId}`);
     return response.data;
 };
-export const getUserId = async () => {
+export const fetchUsers = async () => {
     const response = await axios.get(`${API_BASE_URL}/users`);
     return response.data;
 };
+
 export const createProject = async (projectData) => {
     const response = await axios.post(`${API_BASE_URL}/projects`, projectData);
     return response.data;

@@ -34,7 +34,8 @@ const TaskList = ({
     statusFilter,
     priorityFilter,
     onlyMine,
-    userId
+    userId,
+    userMap
 }) => {
 
 
@@ -108,7 +109,7 @@ const TaskList = ({
                                 Fecha: {task.due_date || "Sin fecha"}
                             </Typography>
                             <Typography variant="caption">
-                                Asignado a: {task.assigned_to || "Nadie"}
+                                Asignado a: {userMap[task.assigned_to] || "Nadie"}
                             </Typography>
                         </Paper>
                     </Grid>

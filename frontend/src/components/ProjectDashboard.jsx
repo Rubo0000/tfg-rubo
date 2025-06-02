@@ -8,7 +8,7 @@ import ProjectStats from "../components/ProjectStats";
 import ProjectOverview from "../components/ProjectOverview";
 import TaskModal from "../components/TaskModal";
 import { updateTask } from "../services/api";
-import { createTask, fetchTasksByProject } from "../services/api"; // ya deberías tener esto
+import { createTask, fetchTasksByProject, fetchUsers } from "../services/api"; // ya deberías tener esto
 import TaskList from "../components/TaskList";
 import TaskFilters from "../components/TaskFilters"; // Asegúrate de tener este componente
 function ProjectDashboard() {
@@ -21,6 +21,8 @@ function ProjectDashboard() {
     const [statusFilter, setStatusFilter] = useState(null);
     const [priorityFilter, setPriorityFilter] = useState(null);
     const [onlyMine, setOnlyMine] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [userMap, setUserMap] = useState({});
     const userId = parseInt(localStorage.getItem("userId"));
     const projectStats = useProjectStats(projectId) || {};
     const { stats, loading, error: statsError, refetchStats } = useProjectStats(projectId);
@@ -39,6 +41,22 @@ function ProjectDashboard() {
     }, [projectId]);
 
 
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const usersData = await fetchUsers();
+                setUsers(usersData);
+                const map = {};
+                usersData.forEach(user => {
+                    map[user.id] = user.name;
+                });
+                setUserMap(map);
+            } catch (err) {
+                console.error("Error al cargar usuarios:", err);
+            }
+        };
+        loadUsers();
+    }, []);
     useEffect(() => {
         const loadProject = async () => {
             try {
@@ -99,7 +117,11 @@ function ProjectDashboard() {
                 setSelectedTask={setSelectedTask}
                 statusFilter={statusFilter}
                 priorityFilter={priorityFilter}
+                onlyMine={onlyMine}
+                userId={userId}
+                userMap={userMap}
             />
+
 
             <Button
                 variant="contained"
