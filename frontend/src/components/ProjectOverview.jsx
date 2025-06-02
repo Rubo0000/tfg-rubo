@@ -21,27 +21,32 @@ function ProjectOverview({ completedTasks, totalTasks, contributions, recentActi
         );
     }
 
-    const pendingTasks = totalTasks - completedTasks;
+    // Nuevos cálculos más precisos para cada estado
+    const completed = completedTasks;
+    const inProgress = contributions.__enProgreso || 0;
+    const pending = totalTasks - completed - inProgress;
 
     const pieData = {
-        labels: ["Completadas", "Pendientes"],
+        labels: ["Completadas", "Pendientes", "En progreso"],
         datasets: [
             {
                 label: "Estado de tareas",
-                data: [completedTasks, pendingTasks],
-                backgroundColor: ["#4caf50", "#ffc107"],
+                data: [completed, pending, inProgress],
+                backgroundColor: ["#4caf50", "#ffc107", "#2196f3"],
                 borderWidth: 1,
             },
         ],
     };
 
     const barData = {
-        labels: Object.keys(contributions),
+        labels: Object.keys(contributions).filter(k => !k.startsWith("__")),
         datasets: [
             {
                 label: "Tareas completadas",
-                data: Object.values(contributions),
-                backgroundColor: "#2196f3",
+                data: Object.entries(contributions)
+                    .filter(([k]) => !k.startsWith("__"))
+                    .map(([, v]) => v),
+                backgroundColor: "#1976d2",
             },
         ],
     };

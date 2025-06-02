@@ -41,3 +41,11 @@ export const createProject = async (projectData) => {
     const response = await axios.post(`${API_BASE_URL}/projects`, projectData);
     return response.data;
 };
+export const createTask = async (taskData) => {
+    const response = await axios.post(`${API_BASE_URL}/tasks`, taskData);
+    return response.data;
+};
+export const updateTask = async (taskId, taskData) => {
+    const response = await axios.put(`${API_BASE_URL}/tasks/${taskId}`, taskData);
+    return response.data;
+};

@@ -1,4 +1,4 @@
-import { Box, Typography, CircularProgress, Alert } from "@mui/material";
+import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { fetchProjectById } from "../services/api";
@@ -6,11 +6,14 @@ import { useProjectStats } from "../hooks/useProjectStats";
 import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
 import ProjectStats from "../components/ProjectStats";
 import ProjectOverview from "../components/ProjectOverview";
+import CreateTaskModal from "../components/CreateTaskModal";
+import { createTask, fetchTasksByProject } from "../services/api"; // ya deberías tener esto
 
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
     const [error, setError] = useState("");
+    const [taskModalOpen, setTaskModalOpen] = useState(false);
 
     const projectStats = useProjectStats(projectId) || {};
     const { stats, loading, error: statsError } = projectStats;
@@ -40,9 +43,27 @@ function ProjectDashboard() {
         );
     }
 
+
+    const handleTaskCreate = async (taskData) => {
+        try {
+            await createTask(taskData);
+            window.location.reload(); // o puedes actualizar useProjectStats si prefieres
+        } catch (err) {
+            console.error("Error al crear tarea:", err);
+        }
+    };
+
     return (
         <Box sx={{ px: 4, py: 6 }}>
             <ProjectDetailsHeader name={project.name} description={project.description} />
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setTaskModalOpen(true)}
+                sx={{ mb: 3 }}
+            >
+                ➕ Crear nueva tarea
+            </Button>
 
             <ProjectStats
                 totalTasks={stats.totalTasks}
@@ -59,6 +80,13 @@ function ProjectDashboard() {
                     recentActivity={stats.recentActivity}
                 />
             </Box>
+            <CreateTaskModal
+                open={taskModalOpen}
+                onClose={() => setTaskModalOpen(false)}
+                onCreate={handleTaskCreate}
+                projectId={parseInt(projectId)}
+            />
+
         </Box>
     );
 }

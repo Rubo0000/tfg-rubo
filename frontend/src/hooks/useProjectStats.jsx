@@ -13,11 +13,10 @@ export const useProjectStats = (projectId) => {
                 const tasks = await fetchTasksByProject(projectId);
                 const userId = parseInt(localStorage.getItem("userId"));
                 const isCompleted = status => ["completada", "finalizada"].includes(status);
+                const inProgressCount = tasks.filter(t => t.status === "en_progreso").length;
 
-                // Obtener IDs únicos de usuarios asignados
                 const assignedUserIds = [...new Set(tasks.map(t => t.assigned_to).filter(Boolean))];
 
-                // Obtener nombres de usuarios
                 const userNamesMap = {};
                 await Promise.all(
                     assignedUserIds.map(async (id) => {
@@ -26,13 +25,14 @@ export const useProjectStats = (projectId) => {
                     })
                 );
 
-                // Calcular contribuciones
                 const contributions = tasks.reduce((acc, t) => {
                     if (!t.assigned_to) return acc;
                     const key = userNamesMap[t.assigned_to] || `Usuario ${t.assigned_to}`;
                     acc[key] = (acc[key] || 0) + (isCompleted(t.status) ? 1 : 0);
                     return acc;
                 }, {});
+
+                contributions.__enProgreso = inProgressCount;
 
                 setStats({
                     totalTasks: tasks.length,
@@ -53,6 +53,7 @@ export const useProjectStats = (projectId) => {
         };
         fetch();
     }, [projectId]);
+
 
     return { stats, loading, error };
 };
