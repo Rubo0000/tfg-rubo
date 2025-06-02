@@ -74,6 +74,15 @@ function ProjectDashboard() {
     return (
         <Box sx={{ px: 4, py: 6 }}>
             <ProjectDetailsHeader name={project.name} description={project.description} />
+
+
+            <TaskList
+                tasks={tasks}
+                onTaskUpdate={loadTasks}
+                setTaskModalOpen={setTaskModalOpen}
+                setSelectedTask={setSelectedTask}
+            />
+
             <Button
                 variant="contained"
                 color="primary"
@@ -83,21 +92,12 @@ function ProjectDashboard() {
                 ➕ Crear nueva tarea
             </Button>
 
-            <TaskList
-                tasks={tasks}
-                onTaskUpdate={loadTasks}
-                setTaskModalOpen={setTaskModalOpen}
-                setSelectedTask={setSelectedTask}
-            />
-
-
             <ProjectStats
                 totalTasks={stats.totalTasks}
                 completedTasks={stats.completedTasks}
                 userTasks={stats.userTasks}
                 recentActivity={stats.recentActivity}
             />
-
             <Box sx={{ mt: 6 }}>
                 <ProjectOverview
                     completedTasks={stats.completedTasks}
