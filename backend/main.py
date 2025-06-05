@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from database.db import database
-from routers import user_router, project_router, task_router, auth_router
+from routers import user_router, project_router, task_router, auth_router, comment_router, attachments_router
 from models import user, project, task  # Importa tus modelos aquí
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -25,6 +25,8 @@ app.include_router(user_router.router)
 app.include_router(project_router.router)
 app.include_router(task_router.router)
 app.include_router(auth_router.router)  # ⬅️ nuevo router
+app.include_router(comment_router.router)
+app.include_router(attachments_router.router)
 
 
 @app.get("/")

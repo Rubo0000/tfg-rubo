@@ -40,11 +40,15 @@ export default function Login() {
 
       if (res.ok) {
         const data = await res.json();
+        console.log(data)
         localStorage.setItem("token", data.access_token);
+        localStorage.setItem("userId", data.user_id);
+
         setError("");
         setOpenSnackbar(true);
         setTimeout(() => navigate("/dashboard"), 2000);
-      } else {
+      }
+      else {
         const err = await res.json();
         setError(err.detail || "Error al iniciar sesión");
         setOpenSnackbar(true);

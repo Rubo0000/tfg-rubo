@@ -7,5 +7,5 @@ class PriorityEnum(str, Enum):
 
 class StatusEnum(str, Enum):
     pendiente = "pendiente"
-    en_progreso = "en_progreso"
+    en_progreso = "en progreso"
     finalizada = "finalizada"

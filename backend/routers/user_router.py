@@ -3,7 +3,7 @@ from database.db import database
 from models.user import User
 from sqlalchemy import insert, select
 from pydantic import BaseModel
-from auth import hash_password
+from backend.models.auth import hash_password
 
 router = APIRouter()
 
