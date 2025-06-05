@@ -3,7 +3,7 @@ from fastapi import APIRouter, HTTPException, Depends, Form
 from sqlalchemy import select
 from database.db import database
 from models.user import User
-from auth import verify_password, create_access_token
+from backend.models.auth import verify_password, create_access_token
 
 router = APIRouter()
 from pydantic import BaseModel

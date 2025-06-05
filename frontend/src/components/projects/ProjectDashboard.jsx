@@ -1,16 +1,16 @@
 import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { fetchProjectById } from "../services/api";
-import { useProjectStats } from "../hooks/useProjectStats";
+import { fetchProjectById } from "../../services/api";
+import { useProjectStats } from "../../hooks/useProjectStats";
 import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
 import ProjectStats from "../components/ProjectStats";
 import ProjectOverview from "../components/ProjectOverview";
-import TaskModal from "../components/TaskModal";
-import { updateTask } from "../services/api";
-import { createTask, fetchTasksByProject, fetchUsers } from "../services/api"; // ya deberías tener esto
-import TaskList from "../components/TaskList";
-import TaskFilters from "../components/TaskFilters"; // Asegúrate de tener este componente
+import TaskModal from "../tasks/TaskModal";
+import { updateTask } from "../../services/api";
+import { createTask, fetchTasksByProject, fetchUsers } from "../../services/api"; // ya deberías tener esto
+import TaskList from "../tasks/TaskList";
+import TaskFilters from "../tasks/TaskFilters"; // Asegúrate de tener este componente
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
