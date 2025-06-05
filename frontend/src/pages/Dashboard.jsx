@@ -1,211 +1,179 @@
-// components/Dashboard.js
-
-import {
-  Box,
-  Typography,
-  Grid,
-  Paper,
-  useTheme,
-  useMediaQuery,
-  Button,
-} from "@mui/material";
-import { Add } from "@mui/icons-material";
-import { motion } from "framer-motion";
+import { Box, Typography, CircularProgress, Alert, Button } from "@mui/material";
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { fetchProjectById } from "../../services/api";
+import { useProjectStats } from "../../hooks/useProjectStats";
+import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
 import ProjectStats from "../components/ProjectStats";
-import { fetchProjects, fetchTasksByProject, fetchProjectsByUser, createProject } from "../services/api";
-import { useNavigate } from "react-router-dom";
-import CreateProjectModal from "../components/CreateProjectModal";
+import ProjectOverview from "../components/ProjectOverview";
+import TaskModal from "../tasks/TaskModal";
+import { updateTask } from "../../services/api";
+import { createTask, fetchTasksByProject, fetchUsers } from "../../services/api"; // ya deberías tener esto
+import TaskList from "../tasks/TaskList";
+import TaskFilters from "../tasks/TaskFilters"; // Asegúrate de tener este componente
+function ProjectDashboard() {
+    const { projectId } = useParams();
+    const [project, setProject] = useState(null);
+    const [error, setError] = useState("");
+    const [taskModalOpen, setTaskModalOpen] = useState(false);
+    const [tasks, setTasks] = useState(null);
+    const [selectedTask, setSelectedTask] = useState(null);
+    const [statusFilter, setStatusFilter] = useState(null);
+    const [priorityFilter, setPriorityFilter] = useState(null);
+    const [onlyMine, setOnlyMine] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [userMap, setUserMap] = useState({});
+    const userId = parseInt(localStorage.getItem("userId"));
+    const projectStats = useProjectStats(projectId) || {};
+    const { stats, loading, error: statsError, refetchStats } = useProjectStats(projectId);
 
-function Dashboard() {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const navigate = useNavigate();
-  const [projects, setProjects] = useState([]);
-  const [selectedProjectId, setSelectedProjectId] = useState(null);
-  const [modalOpen, setModalOpen] = useState(false);
-  const [projectStats, setProjectStats] = useState({
-    totalTasks: 0,
-    completedTasks: 0,
-    userTasks: 0,
-    recentActivity: [],
-  });
-
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const currentUserId = parseInt(localStorage.getItem("userId"));
-        const data = await fetchProjectsByUser(currentUserId);
-        setProjects(data);
-        if (data.length > 0) {
-          setSelectedProjectId(data[0].id);
-        }
-      } catch (error) {
-        console.error("Error fetching user's projects:", error);
-      }
+    const loadTasks = async () => {
+        const data = await fetchTasksByProject(projectId);
+        setTasks(data);
     };
 
-    loadProjects();
-  }, []);
+    useEffect(() => {
+        const loadTasks = async () => {
+            const data = await fetchTasksByProject(projectId);
+            setTasks(data);
+        };
+        loadTasks();
+    }, [projectId]);
 
-  useEffect(() => {
-    const loadProjectStats = async () => {
-      if (selectedProjectId) {
+
+    useEffect(() => {
+        const loadUsers = async () => {
+            try {
+                const usersData = await fetchUsers();
+                setUsers(usersData);
+                const map = {};
+                usersData.forEach(user => {
+                    map[user.id] = user.name;
+                });
+                setUserMap(map);
+            } catch (err) {
+                console.error("Error al cargar usuarios:", err);
+            }
+        };
+        loadUsers();
+    }, []);
+    useEffect(() => {
+        const loadProject = async () => {
+            try {
+                const data = await fetchProjectById(projectId);
+                setProject(data);
+            } catch (err) {
+                setError("No se pudo cargar el proyecto.");
+                console.error(err);
+            }
+        };
+        loadProject();
+    }, [projectId]);
+
+    if (error || statsError) {
+        return <Alert severity="error">{error || statsError}</Alert>;
+    }
+
+    if (!project || loading || !stats) {
+        return (
+            <Box sx={{ px: 4, py: 6 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+
+    const handleTaskCreate = async (taskData) => {
         try {
-          const tasks = await fetchTasksByProject(selectedProjectId);
-          const totalTasks = tasks.length;
-          const completedTasks = tasks.filter(task => task.status === 'finalizada').length;
-          const userId = 1; // Reemplaza con el ID del usuario actual
-          const userTasks = tasks.filter(task => task.assigned_to === userId).length;
-          const recentActivity = tasks
-            .sort((a, b) => new Date(b.due_date) - new Date(a.due_date))
-            .slice(0, 5)
-            .map(task => `Tarea '${task.title}' con estado '${task.status}'`);
-
-          setProjectStats({
-            totalTasks,
-            completedTasks,
-            userTasks,
-            recentActivity,
-          });
-        } catch (error) {
-          console.error("Error fetching project stats:", error);
+            await createTask(taskData);
+            window.location.reload();
+        } catch (err) {
+            console.error("Error al crear tarea:", err);
         }
-      }
     };
 
-    loadProjectStats();
-  }, [selectedProjectId]);
+    return (
+        <Box sx={{ px: 4, py: 6 }}>
+            <ProjectDetailsHeader name={project.name} description={project.description} />
 
-  const handleCreateProject = () => {
-    setModalOpen(true);
-  };
-
-  const handleProjectSubmit = async (data) => {
-    try {
-      await createProject(data);
-      const userId = parseInt(localStorage.getItem("userId"));
-      const updatedProjects = await fetchProjectsByUser(userId);
-      setProjects(updatedProjects);
-    } catch (err) {
-      console.error("Error al crear el proyecto:", err);
-    }
-  };
+            <TaskFilters
+                statusFilter={statusFilter}
+                setStatusFilter={setStatusFilter}
+                priorityFilter={priorityFilter}
+                setPriorityFilter={setPriorityFilter}
+                onlyMine={onlyMine}
+                setOnlyMine={setOnlyMine}
+                userId={userId}
+            />
 
 
+            <TaskList
+                tasks={tasks}
+                onTaskUpdate={async () => {
+                    await loadTasks();
+                    await refetchStats();
+                }}
+                setTaskModalOpen={setTaskModalOpen}
+                setSelectedTask={setSelectedTask}
+                statusFilter={statusFilter}
+                priorityFilter={priorityFilter}
+                onlyMine={onlyMine}
+                userId={userId}
+                userMap={userMap}
+            />
 
 
-  const handleLogout = async () => {
-    try {
-      await axios.post("http://localhost:8000/logout");
-    } catch (err) {
-      console.warn("Logout local, sin respuesta del servidor");
-    }
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-    navigate("/login");
-  };
-
-  return (
-    <Box sx={{ px: 4, py: 6 }}>
-      <Typography variant="h4" fontWeight="bold" gutterBottom>
-        ¡Bienvenido de nuevo! <span role="img">👋</span>
-      </Typography>
-      <Button
-        variant="outlined"
-        color="error"
-        onClick={handleLogout}
-        sx={{ textTransform: "none", fontWeight: "bold" }}
-      >
-        Cerrar sesión
-      </Button>
-      <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
-        {projects.length > 0
-          ? "Estos son tus proyectos actuales:"
-          : "Todavía no tienes proyectos. ¡Empieza uno ahora!"}
-      </Typography>
-
-      <Grid container spacing={3}>
-        {projects.map((project) => (
-          <Grid item xs={12} sm={6} md={4} key={project.id}>
-            <Paper
-              component={motion.div}
-              whileHover={{
-                scale: 1.05,
-                boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
-              }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              elevation={3}
-              sx={{
-                p: 4,
-                borderRadius: 3,
-                textAlign: "center",
-                fontWeight: "bold",
-                height: 150,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                cursor: "pointer",
-              }}
-              onClick={() => navigate(`/projects/${project.id}`)}
-
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => setTaskModalOpen(true)}
+                sx={{ mb: 3 }}
             >
-              {project.name}
-            </Paper>
-          </Grid>
-        ))}
+                ➕ Crear nueva tarea
+            </Button>
 
-        {/* Crear nuevo proyecto */}
-        <Grid item xs={12} sm={6} md={4}>
-          <Paper
-            component={motion.div}
-            whileHover={{
-              scale: 1.07,
-              boxShadow: "0px 12px 28px rgba(0, 0, 0, 0.25)",
-            }}
-            transition={{ type: "spring", stiffness: 250, damping: 15 }}
-            elevation={3}
-            onClick={handleCreateProject}
-            sx={{
-              p: 4,
-              borderRadius: 3,
-              textAlign: "center",
-              height: 150,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              fontWeight: "bold",
-              backgroundColor: "#f8f9fa",
-              border: "2px dashed #c0c0c0",
-              cursor: "pointer",
-              color: "#333",
-              transition: "all 0.3s ease",
-            }}
-          >
-            <Add sx={{ fontSize: 40, mb: 1 }} />
-            Crear nuevo proyecto
-          </Paper>
-        </Grid>
-      </Grid>
+            <ProjectStats
+                totalTasks={stats.totalTasks}
+                completedTasks={stats.completedTasks}
+                userTasks={stats.userTasks}
+                recentActivity={stats.recentActivity}
+            />
+            <Box sx={{ mt: 6 }}>
+                <ProjectOverview
+                    completedTasks={stats.completedTasks}
+                    totalTasks={stats.totalTasks}
+                    contributions={stats.contributions}
+                    recentActivity={stats.recentActivity}
+                />
 
-      {/* Mostrar estadísticas del proyecto seleccionado */}
-      {selectedProjectId && (
-        <ProjectStats
-          totalTasks={projectStats.totalTasks}
-          completedTasks={projectStats.completedTasks}
-          userTasks={projectStats.userTasks}
-          recentActivity={projectStats.recentActivity}
-        />
-      )}<CreateProjectModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        onCreate={handleProjectSubmit}
-      />
+            </Box>
+            <TaskModal
+                open={taskModalOpen}
+                onClose={() => {
+                    setTaskModalOpen(false);
+                    setSelectedTask(null);
+                }}
+                onSubmit={async (data) => {
+                    try {
+                        if (selectedTask) {
+                            await updateTask(selectedTask.id, data);
+                        } else {
+                            await createTask(data);
+                        }
+                        await loadTasks();
+                        await refetchStats(); // ← ¡aquí también!
+                    } catch (err) {
+                        console.error("Error al guardar tarea:", err);
+                    }
+                }}
+                projectId={parseInt(projectId)}
+                initialData={selectedTask}
+            />
 
-    </Box>
 
-  );
+
+        </Box>
+    );
 }
 
-export default Dashboard;
+export default ProjectDashboard;
