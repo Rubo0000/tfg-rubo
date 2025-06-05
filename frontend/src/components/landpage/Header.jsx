@@ -1,5 +1,5 @@
 import { AppBar, Toolbar, Typography, Box } from "@mui/material";
-import LogoTitulo from "../assets/LogoTitulo.png";
+import LogoTitulo from "../../assets/LogoTitulo.png";
 
 function Header() {
   return (

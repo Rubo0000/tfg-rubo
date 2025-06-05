@@ -1,9 +1,9 @@
 import { Box, Container, Stack } from "@mui/material";
-import Header from "../components/Header";
-import HeroSection from "../components/HeroSection";
-import Feature from "../components/Feature";
-import Footer from "../components/Footer";
-import AuthButtons from "../components/AuthButtons";
+import Header from "../components/landpage/Header";
+import HeroSection from "../components/landpage/HeroSection";
+import Feature from "../components/landpage/Feature";
+import Footer from "../components/landpage/Footer";
+import AuthButtons from "../components/landpage/AuthButtons";
 import GestionDeTareas from "../assets/GestionDeTareas.png";
 import SeguimientoDelProgreso from "../assets/SeguimientoDelProgeso.png";
 import SupervisionDocente from "../assets/SupervisionDocente.png";

@@ -24,7 +24,8 @@ import CommentIcon from "@mui/icons-material/Comment";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import { format } from "date-fns";
-import AttachmentsSection from "../AttachmentsSection"; // Asegúrate de tener este componente
+import AttachmentsSection from "./AttachmentsSection";
+
 const TaskDetail = () => {
     const { taskId } = useParams();
     const [task, setTask] = useState(null);

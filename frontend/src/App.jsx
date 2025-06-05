@@ -4,7 +4,7 @@ import Registro from "./pages/Registro";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import ProjectDashboard from "./components/ProjectDashboard";
-import TaskDetail from "./components/TaskDetail";
+import TaskDetail from "./components/tasks/TaskDetail";
 function App() {
   const user = localStorage.getItem("user");
 

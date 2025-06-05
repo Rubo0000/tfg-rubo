@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import { fetchAttachmentsByTaskId, uploadAttachmentToTask } from '../services/api';
+import { fetchAttachmentsByTaskId, uploadAttachmentToTask } from '../../services/api'; // Adjust the import path as necessary
 
 const AttachmentsSection = ({ taskId }) => {
     const [attachments, setAttachments] = useState([]);

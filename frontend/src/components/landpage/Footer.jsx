@@ -1,6 +1,6 @@
 import { Box, Container, Typography, Link, Grid } from "@mui/material";
-import LogoUPV from "../assets/LogoUPV.png";
-import LogoETSINF from "../assets/LogoETSINF.png";
+import LogoUPV from "../../assets/LogoUPV.png";
+import LogoETSINF from "../../assets/LogoETSINF.png";
 
 function Footer() {
   return (
@@ -49,7 +49,7 @@ function Footer() {
           sx={{
             position: "absolute",
             right: 30,
-            bottom:25,
+            bottom: 25,
           }}
         >
           <img src={LogoETSINF} alt="ETSINF Logo" height={100} />

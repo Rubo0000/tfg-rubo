@@ -1,6 +1,6 @@
 import { Box } from "@mui/material";
 import { motion } from "framer-motion";
-import Landpage from "../assets/LandPage.png";
+import Landpage from "../../assets/LandPage.png";
 
 function HeroSection() {
   return (
