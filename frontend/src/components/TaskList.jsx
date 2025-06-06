@@ -1,29 +1,5 @@
-import {
-    Box,
-    Typography,
-    IconButton,
-    Paper,
-    Stack,
-    Tooltip,
-    Chip
-} from "@mui/material";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import WarningAmberIcon from "@mui/icons-material/WarningAmber";
-import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline";
-import { useNavigate } from "react-router-dom";
-
-const statusColors = {
-    "pendiente": "default",
-    "en progreso": "info",
-    "finalizada": "success",
-};
-
-const priorityColors = {
-    "alta": "error",
-    "media": "warning",
-    "baja": "success",
-};
+import { Box, Typography, Grid } from "@mui/material";
+import TaskCard from "./TaskCard";
 
 const getUrgency = (dueDateStr) => {
     if (!dueDateStr) return "normal";
@@ -35,90 +11,54 @@ const getUrgency = (dueDateStr) => {
     return "normal";
 };
 
-const TaskCard = ({ task, onEdit, onDelete, userMap }) => {
-    const urgency = getUrgency(task.due_date);
-    const borderColor =
-        urgency === "overdue" ? "red" :
-            urgency === "upcoming" ? "orange" : "transparent";
-    const dateColor =
-        urgency === "overdue" ? "error.main" :
-            urgency === "upcoming" ? "warning.main" : "text.secondary";
+const TaskList = ({
+    tasks,
+    statusFilter,
+    priorityFilter,
+    onlyMine,
+    userId,
+    userMap,
+    onEdit,
+    onDelete
+}) => {
+    const filtered = tasks.filter(task => {
+        const matchStatus = !statusFilter || task.status === statusFilter;
+        const matchPriority = !priorityFilter || task.priority === priorityFilter;
+        const matchMine = !onlyMine || task.assigned_to === userId;
+        return matchStatus && matchPriority && matchMine;
+    });
 
-    const navigate = useNavigate();
+    const vencidas = filtered.filter(t => getUrgency(t.due_date) === "overdue");
+    const proximas = filtered.filter(t => getUrgency(t.due_date) === "upcoming");
+    const otras = filtered.filter(t => getUrgency(t.due_date) === "normal");
 
-    const handleCardClick = (e) => {
-        // Evita navegación si el clic es en un botón
-        if (e.target.closest("button")) return;
-        navigate(`/tasks/${task.id}`);
-    };
+    const renderGroup = (titulo, tareas) => (
+        tareas.length > 0 && (
+            <>
+                <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>{titulo}</Typography>
+                <Grid container spacing={2}>
+                    {tareas.map(task => (
+                        <Grid item xs={12} sm={6} md={4} lg={3} key={task.id}>
+                            <TaskCard
+                                task={task}
+                                onEdit={onEdit}
+                                onDelete={onDelete}
+                                userMap={userMap}
+                            />
+                        </Grid>
+                    ))}
+                </Grid>
+            </>
+        )
+    );
 
     return (
-        <Paper
-            elevation={3}
-            onClick={handleCardClick}
-            sx={{
-                p: 2,
-                borderRadius: 2,
-                border: `2px solid ${borderColor}`,
-                cursor: "pointer",
-                height: "100%"
-            }}
-        >
-            <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                <Box sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" fontWeight="bold">{task.title}</Typography>
-                    <Typography variant="body2" sx={{ mt: 0.5, mb: 1.5 }}>{task.description}</Typography>
-
-                    <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
-                        <Chip label={task.priority} color={priorityColors[task.priority]} size="small" />
-                        <Chip label={task.status} color={statusColors[task.status]} size="small" />
-                        {urgency === "overdue" && (
-                            <Tooltip title="¡Tarea vencida!">
-                                <Chip icon={<ErrorOutlineIcon />} label="Vencida" color="error" size="small" />
-                            </Tooltip>
-                        )}
-                        {urgency === "upcoming" && (
-                            <Tooltip title="Tarea próxima a vencer">
-                                <Chip icon={<WarningAmberIcon />} label="Próxima" color="warning" size="small" />
-                            </Tooltip>
-                        )}
-                    </Stack>
-
-                    <Typography variant="caption" display="block" sx={{ color: dateColor, fontWeight: urgency ? 'bold' : 'normal' }}>
-                        Fecha: {task.due_date || "Sin fecha"}
-                    </Typography>
-                    <Typography variant="caption">
-                        Asignado a: {userMap[task.assigned_to] || "Nadie"}
-                    </Typography>
-                </Box>
-
-                <Stack direction="row" spacing={1}>
-                    <Tooltip title="Editar">
-                        <IconButton
-                            onClick={(e) => {
-                                e.stopPropagation(); // Previene navegación
-                                onEdit(task);
-                            }}
-                            size="small"
-                        >
-                            <EditIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                    <Tooltip title="Eliminar">
-                        <IconButton
-                            onClick={(e) => {
-                                e.stopPropagation(); // Previene navegación
-                                onDelete(task.id);
-                            }}
-                            size="small"
-                        >
-                            <DeleteIcon fontSize="small" />
-                        </IconButton>
-                    </Tooltip>
-                </Stack>
-            </Stack>
-        </Paper>
+        <Box sx={{ mt: 4 }}>
+            {renderGroup("🎉 Vencidas", vencidas)}
+            {renderGroup("⚠️ Próximas (≤ 3 días)", proximas)}
+            {renderGroup("📌 Otras tareas", otras)}
+        </Box>
     );
 };
 
-export default TaskCard;
+export default TaskList;
