@@ -36,6 +36,7 @@ const getUrgency = (dueDateStr) => {
 };
 
 const TaskCard = ({ task, onEdit, onDelete, userMap }) => {
+    //console.log("Rendering TaskCard for task:", task);
     const urgency = getUrgency(task.due_date);
     const borderColor =
         urgency === "overdue" ? "red" :

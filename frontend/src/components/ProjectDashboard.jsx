@@ -2,9 +2,11 @@ import {
     Box, CircularProgress, Alert, Button
 } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
-    fetchProjectById, fetchTasksByProject, createTask, updateTask, fetchUsers, deleteTask
+    fetchProjectById, fetchTasksByProject, createTask, updateTask,
+    fetchUsersByProject, deleteTask, removeUserFromProject, addUserToProject,
+    fetchUsers
 } from "../services/api";
 import { useProjectStats } from "../hooks/useProjectStats";
 import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
@@ -12,7 +14,8 @@ import ProjectStats from "../components/ProjectStats";
 import ProjectOverview from "../components/ProjectOverview";
 import CreateTaskModal from "../components/CreateTaskModal";
 import TaskFilters from "../components/TaskFilters";
-import TaskList from "../components/TaskList"; // ← importante
+import TaskList from "../components/TaskList";
+import ProjectMembers from "../components/ProjectMembers";
 
 function ProjectDashboard() {
     const { projectId } = useParams();
@@ -25,6 +28,7 @@ function ProjectDashboard() {
     const [priorityFilter, setPriorityFilter] = useState(null);
     const [onlyMine, setOnlyMine] = useState(false);
     const [users, setUsers] = useState([]);
+    const [projectUsers, setProjectUsers] = useState([]);
     const [userMap, setUserMap] = useState({});
     const userId = parseInt(localStorage.getItem("userId"));
     const { stats, loading, error: statsError, refetchStats } = useProjectStats(projectId);
@@ -34,30 +38,59 @@ function ProjectDashboard() {
         setTasks(data);
     };
 
+    const loadProjectUsers = async () => {
+        try {
+            const data = await fetchUsersByProject(projectId);
+            setProjectUsers(data);
+            console.log("Usuarios del proyecto:", data);
+        } catch (err) {
+            console.error("Error al obtener usuarios del proyecto", err);
+        }
+    };
+
+    const loadUsers = async () => {
+        try {
+            const data = await fetchUsers();
+            setUsers(data);
+            console.log("Usuarios en general:", data);
+            const map = {};
+            data.forEach(user => {
+                map[user.id] = user.name;
+            });
+            setUserMap(map);
+            console.log("Mapa de usuarios:", map);
+        } catch (err) {
+            console.error("Error al obtener usuarios en general ", err);
+        }
+    };
+
+    const handleAddUser = async (userId) => {
+        try {
+            await addUserToProject(projectId, userId);
+            await loadProjectUsers();
+        } catch (err) {
+            console.error("Error al agregar usuario al proyecto", err);
+        }
+    };
+
+    const handleRemoveUser = async (userId) => {
+        try {
+            await removeUserFromProject(projectId, userId);
+            await loadProjectUsers();
+        } catch (err) {
+            console.error("Error al eliminar usuario del proyecto", err);
+        }
+    };
+
     useEffect(() => {
         if (!projectId) {
             setError("ID de proyecto no válido.");
             return;
         }
         loadTasks();
-    }, [projectId]);
-
-    useEffect(() => {
-        const loadUsers = async () => {
-            try {
-                const usersData = await fetchUsers();
-                setUsers(usersData);
-                const map = {};
-                usersData.forEach(user => {
-                    map[user.id] = user.name;
-                });
-                setUserMap(map);
-            } catch (err) {
-                console.error("Error al cargar usuarios:", err);
-            }
-        };
+        loadProjectUsers();
         loadUsers();
-    }, []);
+    }, [projectId]);
 
     useEffect(() => {
         const loadProject = async () => {
@@ -87,6 +120,13 @@ function ProjectDashboard() {
     return (
         <Box sx={{ px: 4, py: 6 }}>
             <ProjectDetailsHeader name={project.name} description={project.description} />
+
+            <ProjectMembers
+                allUsers={users}
+                projectUsers={projectUsers}
+                onAddUser={handleAddUser}
+                onRemoveUser={handleRemoveUser}
+            />
 
             <TaskFilters
                 statusFilter={statusFilter}
@@ -156,9 +196,11 @@ function ProjectDashboard() {
                 }}
                 projectId={parseInt(projectId)}
                 initialData={selectedTask}
-                users={users}
+                users={projectUsers.map(user => ({
+                    id: user.id,
+                    name: user.name
+                }))}
             />
-
         </Box>
     );
 }
