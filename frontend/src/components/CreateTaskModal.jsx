@@ -1,4 +1,3 @@
-// components/CreateTaskModal.jsx
 import {
     Dialog,
     DialogTitle,
@@ -9,12 +8,12 @@ import {
     MenuItem,
     Box
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const priorities = ["alta", "media", "baja"];
 const statuses = ["pendiente", "en progreso", "finalizada"];
 
-const CreateTaskModal = ({ open, onClose, onCreate, projectId }) => {
+const CreateTaskModal = ({ open, onClose, onCreate, projectId, users, initialData }) => {
     const [form, setForm] = useState({
         title: "",
         description: "",
@@ -24,31 +23,41 @@ const CreateTaskModal = ({ open, onClose, onCreate, projectId }) => {
         assigned_to: "",
     });
 
+    useEffect(() => {
+        if (initialData) {
+            setForm({
+                ...initialData,
+                assigned_to: initialData.assigned_to || "",
+            });
+        } else {
+            setForm({
+                title: "",
+                description: "",
+                due_date: "",
+                priority: "media",
+                status: "pendiente",
+                assigned_to: "",
+            });
+        }
+    }, [initialData]);
+
     const handleChange = (field) => (e) => {
         setForm((prev) => ({ ...prev, [field]: e.target.value }));
     };
 
     const handleSubmit = () => {
-        const userId = form.assigned_to ? parseInt(form.assigned_to) : null;
-        onCreate({
+        const payload = {
             ...form,
             project_id: projectId,
-            assigned_to: userId,
-        });
-        setForm({
-            title: "",
-            description: "",
-            due_date: "",
-            priority: "media",
-            status: "pendiente",
-            assigned_to: "",
-        });
+            assigned_to: form.assigned_to ? parseInt(form.assigned_to) : null,
+        };
+        onCreate(payload);
         onClose();
     };
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>Nueva Tarea</DialogTitle>
+            <DialogTitle>{initialData ? "Editar Tarea" : "Nueva Tarea"}</DialogTitle>
             <DialogContent>
                 <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
                     <TextField label="Título" value={form.title} onChange={handleChange("title")} fullWidth />
@@ -88,17 +97,25 @@ const CreateTaskModal = ({ open, onClose, onCreate, projectId }) => {
                         ))}
                     </TextField>
                     <TextField
-                        label="ID de usuario asignado"
+                        select
+                        label="Asignado a"
                         value={form.assigned_to}
                         onChange={handleChange("assigned_to")}
-                        placeholder="(Opcional)"
-                    />
+                        fullWidth
+                    >
+                        <MenuItem value="">Nadie</MenuItem>
+                        {users.map((user) => (
+                            <MenuItem key={user.id} value={user.id}>
+                                {user.name}
+                            </MenuItem>
+                        ))}
+                    </TextField>
                 </Box>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose}>Cancelar</Button>
                 <Button onClick={handleSubmit} variant="contained">
-                    Crear
+                    {initialData ? "Guardar cambios" : "Crear"}
                 </Button>
             </DialogActions>
         </Dialog>

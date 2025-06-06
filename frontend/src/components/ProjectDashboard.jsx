@@ -4,13 +4,13 @@ import {
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import {
-    fetchProjectById, fetchTasksByProject, createTask, updateTask, fetchUsers
+    fetchProjectById, fetchTasksByProject, createTask, updateTask, fetchUsers, deleteTask
 } from "../services/api";
 import { useProjectStats } from "../hooks/useProjectStats";
 import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
 import ProjectStats from "../components/ProjectStats";
 import ProjectOverview from "../components/ProjectOverview";
-import TaskModal from "../components/TaskModal";
+import CreateTaskModal from "../components/CreateTaskModal";
 import TaskFilters from "../components/TaskFilters";
 import TaskList from "../components/TaskList"; // ← importante
 
@@ -109,8 +109,12 @@ function ProjectDashboard() {
                     setSelectedTask(t);
                     setTaskModalOpen(true);
                 }}
-                onDelete={async (id) => {
-                    // lógica de borrado si la tienes implementada
+                onDelete={async (t) => {
+                    try {
+                        await deleteTask(t);
+                    } catch (err) {
+                        console.error("Error al eliminar tarea:", err);
+                    }
                     await loadTasks();
                     await refetchStats();
                 }}
@@ -131,13 +135,13 @@ function ProjectDashboard() {
                 <ProjectOverview {...stats} />
             </Box>
 
-            <TaskModal
+            <CreateTaskModal
                 open={taskModalOpen}
                 onClose={() => {
                     setTaskModalOpen(false);
                     setSelectedTask(null);
                 }}
-                onSubmit={async (data) => {
+                onCreate={async (data) => {
                     try {
                         if (selectedTask) {
                             await updateTask(selectedTask.id, data);
@@ -152,7 +156,9 @@ function ProjectDashboard() {
                 }}
                 projectId={parseInt(projectId)}
                 initialData={selectedTask}
+                users={users}
             />
+
         </Box>
     );
 }
