@@ -148,6 +148,7 @@ function ProjectDashboard() {
                     onlyMine={onlyMine}
                     userId={userId}
                     userMap={userMap}
+                    projectId={projectId}
                     onEdit={(t) => {
                         setSelectedTask(t);
                         setTaskModalOpen(true);

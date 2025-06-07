@@ -27,7 +27,8 @@ import CommentIcon from "@mui/icons-material/Comment";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import { format } from "date-fns";
-import AttachmentsSection from "./AttachmentsSection"; // Asegúrate de tener este componente
+import AttachmentsSection from "./AttachmentsSection";
+import AppHeader from "./AppHeader";
 const TaskDetail = () => {
     const { taskId } = useParams();
     const [task, setTask] = useState(null);
@@ -65,81 +66,84 @@ const TaskDetail = () => {
     if (!task) return <Typography>Cargando...</Typography>;
 
     return (
-        <Box sx={{ p: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                {task.title}
-            </Typography>
-            <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
-                <Chip label={task.status} color="primary" />
-                <Chip label={task.priority} color="secondary" />
-                <Chip label={`Asignado a: ${task.assigned_to_name}`} />
-                <Chip label={`Fecha límite: ${format(new Date(task.due_date), 'dd/MM/yyyy')}`} />
-            </Stack>
-            <Paper elevation={3} sx={{ p: 2 }}>
-                <Tabs value={tabIndex} onChange={(e, newValue) => setTabIndex(newValue)} aria-label="task detail tabs">
-                    <Tab label="Información" icon={<InfoIcon />} iconPosition="start" />
-                    <Tab label="Comentarios" icon={<CommentIcon />} iconPosition="start" />
-                    <Tab label="Adjuntos" icon={<InsertDriveFileIcon />} iconPosition="start" />
-                    <Tab label="Historial" icon={<HistoryIcon />} iconPosition="start" />
-                </Tabs>
-                <Divider sx={{ my: 2 }} />
-                {tabIndex === 0 && (
-                    <Box>
-                        <Typography variant="h6">Descripción</Typography>
-                        <Typography>{task.description}</Typography>
-                    </Box>
-                )}
-                {tabIndex === 1 && (
-                    <Box>
-                        <List>
-                            {comments.map((comment) => (
-                                <ListItem key={comment.id} alignItems="flex-start">
-                                    <ListItemAvatar>
-                                        <Avatar>{comment.author_name.charAt(0)}</Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={comment.author_name}
-                                        secondary={
-                                            <>
-                                                <Typography component="span" variant="body2" color="text.primary">
-                                                    {format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm')}
-                                                </Typography>
-                                                {" — "}{comment.content}
-                                            </>
-                                        }
-                                    />
-                                    {comment.user_id === userId && (
-                                        <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteComment(comment.id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    )}
-                                </ListItem>
-                            ))}
-                        </List>
-                        <TextField
-                            label="Nuevo comentario"
-                            multiline
-                            fullWidth
-                            rows={4}
-                            value={newComment}
-                            onChange={(e) => setNewComment(e.target.value)}
-                            variant="outlined"
-                            sx={{ mt: 2 }}
-                        />
-                        <Button variant="contained" sx={{ mt: 1 }} onClick={handleAddComment}>
-                            Añadir comentario
-                        </Button>
-                    </Box>
-                )}
-                {tabIndex === 2 && <AttachmentsSection taskId={task.id} />}
+        <>
+            <AppHeader />
+            <Box sx={{ p: 4 }}>
+                <Typography variant="h4" gutterBottom>
+                    {task.title}
+                </Typography>
+                <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
+                    <Chip label={task.status} color="primary" />
+                    <Chip label={task.priority} color="secondary" />
+                    <Chip label={`Asignado a: ${task.assigned_to_name}`} />
+                    <Chip label={`Fecha límite: ${format(new Date(task.due_date), 'dd/MM/yyyy')}`} />
+                </Stack>
+                <Paper elevation={3} sx={{ p: 2 }}>
+                    <Tabs value={tabIndex} onChange={(e, newValue) => setTabIndex(newValue)} aria-label="task detail tabs">
+                        <Tab label="Información" icon={<InfoIcon />} iconPosition="start" />
+                        <Tab label="Comentarios" icon={<CommentIcon />} iconPosition="start" />
+                        <Tab label="Adjuntos" icon={<InsertDriveFileIcon />} iconPosition="start" />
+                        <Tab label="Historial" icon={<HistoryIcon />} iconPosition="start" />
+                    </Tabs>
+                    <Divider sx={{ my: 2 }} />
+                    {tabIndex === 0 && (
+                        <Box>
+                            <Typography variant="h6">Descripción</Typography>
+                            <Typography>{task.description}</Typography>
+                        </Box>
+                    )}
+                    {tabIndex === 1 && (
+                        <Box>
+                            <List>
+                                {comments.map((comment) => (
+                                    <ListItem key={comment.id} alignItems="flex-start">
+                                        <ListItemAvatar>
+                                            <Avatar>{comment.author_name.charAt(0)}</Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={comment.author_name}
+                                            secondary={
+                                                <>
+                                                    <Typography component="span" variant="body2" color="text.primary">
+                                                        {format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm')}
+                                                    </Typography>
+                                                    {" — "}{comment.content}
+                                                </>
+                                            }
+                                        />
+                                        {comment.user_id === userId && (
+                                            <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteComment(comment.id)}>
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        )}
+                                    </ListItem>
+                                ))}
+                            </List>
+                            <TextField
+                                label="Nuevo comentario"
+                                multiline
+                                fullWidth
+                                rows={4}
+                                value={newComment}
+                                onChange={(e) => setNewComment(e.target.value)}
+                                variant="outlined"
+                                sx={{ mt: 2 }}
+                            />
+                            <Button variant="contained" sx={{ mt: 1 }} onClick={handleAddComment}>
+                                Añadir comentario
+                            </Button>
+                        </Box>
+                    )}
+                    {tabIndex === 2 && <AttachmentsSection taskId={task.id} />}
 
-                {tabIndex === 3 && (
-                    <Box>
-                        <Typography>Historial de cambios (en desarrollo)</Typography>
-                    </Box>
-                )}
-            </Paper>
-        </Box>
+                    {tabIndex === 3 && (
+                        <Box>
+                            <Typography>Historial de cambios (en desarrollo)</Typography>
+                        </Box>
+                    )}
+                </Paper>
+            </Box>
+        </>
     );
 };
 

@@ -19,7 +19,8 @@ const TaskList = ({
     userId,
     userMap,
     onEdit,
-    onDelete
+    onDelete,
+    projectId,
 }) => {
     const filtered = tasks.filter(task => {
         const matchStatus = !statusFilter || task.status === statusFilter;
@@ -40,6 +41,7 @@ const TaskList = ({
                     {tareas.map(task => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={task.id}>
                             <TaskCard
+                                projectId={projectId}
                                 task={task}
                                 onEdit={onEdit}
                                 onDelete={onDelete}
