@@ -105,3 +105,12 @@ export const addUserToProject = async (projectId, userId) => {
     const response = await axios.post(`${API_BASE_URL}/projects/${projectId}/users/${userId}`);
     return response.data;
 };
+export const logoutUser = async () => {
+    try {
+        await axios.post(`${API_BASE_URL}/logout`);
+    } catch (err) {
+        console.warn("Logout local sin respuesta del servidor");
+    } finally {
+        localStorage.clear();
+    }
+};

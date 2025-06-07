@@ -16,6 +16,7 @@ import CreateTaskModal from "../components/CreateTaskModal";
 import TaskFilters from "../components/TaskFilters";
 import TaskList from "../components/TaskList";
 import ProjectMembers from "../components/ProjectMembers";
+import AppHeader from "../components/AppHeader";
 
 function ProjectDashboard() {
     const { projectId } = useParams();
@@ -118,90 +119,110 @@ function ProjectDashboard() {
     }
 
     return (
-        <Box sx={{ px: 4, py: 6 }}>
-            <ProjectDetailsHeader name={project.name} description={project.description} />
+        <>
+            <AppHeader />
+            <Box sx={{ px: 4, py: 6 }}>
+                <ProjectDetailsHeader name={project.name} description={project.description} />
 
-            <ProjectMembers
-                allUsers={users}
-                projectUsers={projectUsers}
-                onAddUser={handleAddUser}
-                onRemoveUser={handleRemoveUser}
-            />
+                <ProjectMembers
+                    allUsers={users}
+                    projectUsers={projectUsers}
+                    onAddUser={handleAddUser}
+                    onRemoveUser={handleRemoveUser}
+                />
 
-            <TaskFilters
-                statusFilter={statusFilter}
-                setStatusFilter={setStatusFilter}
-                priorityFilter={priorityFilter}
-                setPriorityFilter={setPriorityFilter}
-                onlyMine={onlyMine}
-                setOnlyMine={setOnlyMine}
-                userId={userId}
-            />
+                <TaskFilters
+                    statusFilter={statusFilter}
+                    setStatusFilter={setStatusFilter}
+                    priorityFilter={priorityFilter}
+                    setPriorityFilter={setPriorityFilter}
+                    onlyMine={onlyMine}
+                    setOnlyMine={setOnlyMine}
+                    userId={userId}
+                />
 
-            <TaskList
-                tasks={tasks}
-                statusFilter={statusFilter}
-                priorityFilter={priorityFilter}
-                onlyMine={onlyMine}
-                userId={userId}
-                userMap={userMap}
-                onEdit={(t) => {
-                    setSelectedTask(t);
-                    setTaskModalOpen(true);
-                }}
-                onDelete={async (t) => {
-                    try {
-                        await deleteTask(t);
-                    } catch (err) {
-                        console.error("Error al eliminar tarea:", err);
-                    }
-                    await loadTasks();
-                    await refetchStats();
-                }}
-            />
-
-            <Button
-                variant="contained"
-                color="primary"
-                onClick={() => setTaskModalOpen(true)}
-                sx={{ mt: 3 }}
-            >
-                ➕ Crear nueva tarea
-            </Button>
-
-            <ProjectStats {...stats} />
-
-            <Box sx={{ mt: 6 }}>
-                <ProjectOverview {...stats} />
-            </Box>
-
-            <CreateTaskModal
-                open={taskModalOpen}
-                onClose={() => {
-                    setTaskModalOpen(false);
-                    setSelectedTask(null);
-                }}
-                onCreate={async (data) => {
-                    try {
-                        if (selectedTask) {
-                            await updateTask(selectedTask.id, data);
-                        } else {
-                            await createTask(data);
+                <TaskList
+                    tasks={tasks}
+                    statusFilter={statusFilter}
+                    priorityFilter={priorityFilter}
+                    onlyMine={onlyMine}
+                    userId={userId}
+                    userMap={userMap}
+                    onEdit={(t) => {
+                        setSelectedTask(t);
+                        setTaskModalOpen(true);
+                    }}
+                    onDelete={async (t) => {
+                        try {
+                            await deleteTask(t);
+                        } catch (err) {
+                            console.error("Error al eliminar tarea:", err);
                         }
                         await loadTasks();
                         await refetchStats();
-                    } catch (err) {
-                        console.error("Error al guardar tarea:", err);
-                    }
-                }}
-                projectId={parseInt(projectId)}
-                initialData={selectedTask}
-                users={projectUsers.map(user => ({
-                    id: user.id,
-                    name: user.name
-                }))}
-            />
-        </Box>
+                    }}
+                />
+
+                <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => setTaskModalOpen(true)}
+                    sx={{ mt: 3 }}
+                >
+                    ➕ Crear nueva tarea
+                </Button>
+
+                <ProjectStats {...stats} />
+
+                <Box sx={{ mt: 6 }}>
+                    <ProjectOverview {...stats} />
+                </Box>
+
+                <CreateTaskModal
+                    open={taskModalOpen}
+                    onClose={() => {
+                        setTaskModalOpen(false);
+                        setSelectedTask(null);
+                    }}
+                    onCreate={async (data) => {
+                        try {
+                            if (selectedTask) {
+                                await updateTask(selectedTask.id, data);
+                            } else {
+                                await createTask(data);
+                            }
+                            await loadTasks();
+                            await refetchStats();
+                        } catch (err) {
+                            console.error("Error al guardar tarea:", err);
+                        }
+                    }}
+                    projectId={parseInt(projectId)}
+                    initialData={selectedTask}
+                    users={projectUsers.map(user => ({
+                        id: user.id,
+                        name: user.name
+                    }))}
+                />
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => window.history.back()}
+                    sx={{
+                        mb: 2,
+                        textTransform: "none",
+                        fontWeight: "bold",
+                        borderRadius: 2,
+                        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
+                    }}
+                >
+                    ← Volver al dashboard
+                </Button>
+
+            </Box>
+
+        </>
+
     );
 }
 
