@@ -15,7 +15,6 @@ function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/dashboard" element={<Dashboard />} />
       <Route path="/projects/:projectId" element={<ProjectDashboard />} />
-      <Route path="*" element={<Navigate to="/" />} />
       <Route path="/tasks/:taskId" element={<TaskDetail />} />
     </Routes>
   );

@@ -1,11 +1,11 @@
-# routers/attachments.py
 from fastapi import APIRouter, UploadFile, File, Depends
 from sqlalchemy.orm import Session
-from models.attachment import Attachment, AttachmentOut
+from models.attachment import Attachment
 from schemas.attachment import AttachmentOut
 from database.db import get_db
 import shutil
 import os
+from datetime import datetime
 
 router = APIRouter()
 
@@ -20,13 +20,15 @@ def upload_attachment(task_id: int, file: UploadFile = File(...), db: Session = 
         shutil.copyfileobj(file.file, buffer)
     attachment = Attachment(
         filename=file.filename,
-        filepath=file_location,
-        task_id=task_id
+        filepath=f"/uploads/{file.filename}",  # Ruta relativa para acceso público
+        task_id=task_id,
+        uploaded_at=datetime.utcnow()
     )
     db.add(attachment)
     db.commit()
     db.refresh(attachment)
     return attachment
+
 
 @router.get("/tasks/{task_id}/attachments", response_model=list[AttachmentOut])
 def get_attachments(task_id: int, db: Session = Depends(get_db)):

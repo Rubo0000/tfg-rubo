@@ -77,14 +77,14 @@ export const addCommentToTask = async (taskId, commentData) => {
 };
 
 export const fetchAttachmentsByTaskId = async (taskId) => {
-    const response = await axios.get(`/tasks/${taskId}/attachments`);
+    const response = await axios.get(`${API_BASE_URL}/tasks/${taskId}/attachments`);
     return response.data;
 };
 
 export const uploadAttachmentToTask = async (taskId, file) => {
     const formData = new FormData();
     formData.append('file', file);
-    const response = await axios.post(`/tasks/${taskId}/attachments`, formData, {
+    const response = await axios.post(`${API_BASE_URL}/tasks/${taskId}/attachments`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data',
         },

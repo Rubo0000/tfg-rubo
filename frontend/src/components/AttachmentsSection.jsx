@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import DownloadIcon from '@mui/icons-material/Download';
 import { fetchAttachmentsByTaskId, uploadAttachmentToTask } from '../services/api';
 
 const AttachmentsSection = ({ taskId }) => {
@@ -69,11 +70,11 @@ const AttachmentsSection = ({ taskId }) => {
                                 />
                                 <IconButton
                                     component="a"
-                                    href={attachment.filepath}
+                                    href={`http://localhost:8000/uploads/${encodeURIComponent(attachment.filename)}`}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                 >
-                                    <CloudUploadIcon />
+                                    <DownloadIcon />
                                 </IconButton>
                             </ListItem>
                         ))}

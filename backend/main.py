@@ -3,7 +3,7 @@ from database.db import database
 from routers import user_router, project_router, task_router, auth_router, comment_router, attachments_router
 from models import user, project, task  # Importa tus modelos aquí
 from fastapi.middleware.cors import CORSMiddleware
-
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI()
 app.add_middleware(
@@ -20,7 +20,7 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await database.disconnect()
-
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.include_router(user_router.router)
 app.include_router(project_router.router)
 app.include_router(task_router.router)
