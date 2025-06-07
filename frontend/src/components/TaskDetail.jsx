@@ -15,10 +15,13 @@ import {
     ListItem,
     ListItemAvatar,
     ListItemText,
+    IconButton,
 } from "@mui/material";
+
+import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { fetchTaskById, fetchCommentsByTaskId, addCommentToTask } from "../services/api";
+import { fetchTaskById, fetchCommentsByTaskId, addCommentToTask, deleteComment } from "../services/api";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CommentIcon from "@mui/icons-material/Comment";
 import HistoryIcon from "@mui/icons-material/History";
@@ -31,7 +34,7 @@ const TaskDetail = () => {
     const [comments, setComments] = useState([]);
     const [tabIndex, setTabIndex] = useState(0);
     const [newComment, setNewComment] = useState("");
-
+    const userId = parseInt(localStorage.getItem("userId"));
     useEffect(() => {
         const loadTask = async () => {
             const data = await fetchTaskById(taskId);
@@ -47,10 +50,16 @@ const TaskDetail = () => {
 
     const handleAddComment = async () => {
         if (newComment.trim() === "") return;
-        await addCommentToTask(taskId, { content: newComment });
+        await addCommentToTask(taskId, { content: newComment, user_id: userId });
         const updatedComments = await fetchCommentsByTaskId(taskId);
         setComments(updatedComments);
         setNewComment("");
+    };
+
+    const handleDeleteComment = async (commentId) => {
+        await deleteComment(commentId, userId);
+        const updatedComments = await fetchCommentsByTaskId(taskId);
+        setComments(updatedComments);
     };
 
     if (!task) return <Typography>Cargando...</Typography>;
@@ -99,6 +108,11 @@ const TaskDetail = () => {
                                             </>
                                         }
                                     />
+                                    {comment.user_id === userId && (
+                                        <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteComment(comment.id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    )}
                                 </ListItem>
                             ))}
                         </List>

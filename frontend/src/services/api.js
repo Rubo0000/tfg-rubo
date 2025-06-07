@@ -114,3 +114,10 @@ export const logoutUser = async () => {
         localStorage.clear();
     }
 };
+
+export const deleteComment = async (commentId, userId) => {
+    const response = await axios.delete(
+        `${API_BASE_URL}/comments/${commentId}?user_id=${userId}`
+    );
+    return response.data;
+};

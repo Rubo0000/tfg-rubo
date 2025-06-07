@@ -62,14 +62,12 @@ async def get_tasks_by_user(user_id: int):
 
 @router.put("/tasks/{task_id}")
 async def update_task(task_id: int, updated_task: TaskUpdate):
-    # Primero comprobamos si la tarea existe
     check_query = select(Task).where(Task.id == task_id)
     task = await database.fetch_one(check_query)
 
     if not task:
         raise HTTPException(status_code=404, detail="Tarea no encontrada")
 
-    # Si existe, actualizamos solo los campos no nulos
     update_query = (
         update(Task)
         .where(Task.id == task_id)
