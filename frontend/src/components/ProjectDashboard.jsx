@@ -205,20 +205,6 @@ function ProjectDashboard() {
                         name: user.name
                     }))}
                 />
-                <Button
-                    variant="outlined"
-                    color="secondary"
-                    onClick={() => window.history.back()}
-                    sx={{
-                        mb: 2,
-                        textTransform: "none",
-                        fontWeight: "bold",
-                        borderRadius: 2,
-                        boxShadow: "0px 2px 8px rgba(0, 0, 0, 0.1)",
-                    }}
-                >
-                    ← Volver al dashboard
-                </Button>
 
             </Box>
 
