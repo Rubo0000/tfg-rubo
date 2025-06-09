@@ -9,18 +9,23 @@ import {
 } from "@mui/material";
 import { Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import ProjectStats from "../components/ProjectStats";
-import { fetchProjects, fetchTasksByProject, fetchProjectsByUser, createProject } from "../services/api";
+import {
+  fetchTasksByProject,
+  fetchProjectsByUser,
+  createProject,
+} from "../services/api";
 import { useNavigate } from "react-router-dom";
 import CreateProjectModal from "../components/CreateProjectModal";
 import AppHeader from "../components/AppHeader";
-
+import PendingInvitations from "../components/PendingInvitations";
 
 function Dashboard() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const navigate = useNavigate();
+  const userId = parseInt(localStorage.getItem("userId"));
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
@@ -31,22 +36,21 @@ function Dashboard() {
     recentActivity: [],
   });
 
-  useEffect(() => {
-    const loadProjects = async () => {
-      try {
-        const currentUserId = parseInt(localStorage.getItem("userId"));
-        const data = await fetchProjectsByUser(currentUserId);
-        setProjects(data);
-        if (data.length > 0) {
-          setSelectedProjectId(data[0].id);
-        }
-      } catch (error) {
-        console.error("Error fetching user's projects:", error);
+  const loadUserProjects = useCallback(async () => {
+    try {
+      const data = await fetchProjectsByUser(userId);
+      setProjects(data);
+      if (data.length > 0) {
+        setSelectedProjectId(data[0].id);
       }
-    };
+    } catch (error) {
+      console.error("Error fetching user's projects:", error);
+    }
+  }, [userId]);
 
-    loadProjects();
-  }, []);
+  useEffect(() => {
+    loadUserProjects();
+  }, [loadUserProjects]);
 
   useEffect(() => {
     const loadProjectStats = async () => {
@@ -54,9 +58,8 @@ function Dashboard() {
         try {
           const tasks = await fetchTasksByProject(selectedProjectId);
           const totalTasks = tasks.length;
-          const completedTasks = tasks.filter(task => task.status === 'finalizada').length;
-          const userId = 1; // Reemplaza con el ID del usuario actual
-          const userTasks = tasks.filter(task => task.assigned_to === userId).length;
+          const completedTasks = tasks.filter(t => t.status === "finalizada").length;
+          const userTasks = tasks.filter(t => t.assigned_to === userId).length;
           const recentActivity = tasks
             .sort((a, b) => new Date(b.due_date) - new Date(a.due_date))
             .slice(0, 5)
@@ -69,24 +72,20 @@ function Dashboard() {
             recentActivity,
           });
         } catch (error) {
-          console.error("Error fetching project stats:", error);
+          console.error("Error loading project stats:", error);
         }
       }
     };
 
     loadProjectStats();
-  }, [selectedProjectId]);
+  }, [selectedProjectId, userId]);
 
-  const handleCreateProject = () => {
-    setModalOpen(true);
-  };
+  const handleCreateProject = () => setModalOpen(true);
 
   const handleProjectSubmit = async (data) => {
     try {
       await createProject(data);
-      const userId = parseInt(localStorage.getItem("userId"));
-      const updatedProjects = await fetchProjectsByUser(userId);
-      setProjects(updatedProjects);
+      await loadUserProjects();
     } catch (err) {
       console.error("Error al crear el proyecto:", err);
     }
@@ -95,10 +94,9 @@ function Dashboard() {
   return (
     <>
       <AppHeader />
-
       <Box sx={{ px: 4, py: 6 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
-          ¡Bienvenido de nuevo! <span role="img">👋</span>
+          ¡Bienvenido de nuevo! 👋
         </Typography>
         <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
           {projects.length > 0
@@ -106,15 +104,15 @@ function Dashboard() {
             : "Todavía no tienes proyectos. ¡Empieza uno ahora!"}
         </Typography>
 
+        {/* ✅ Recarga proyectos tras aceptar invitación */}
+        <PendingInvitations userId={userId} onHandled={loadUserProjects} />
+
         <Grid container spacing={3}>
           {projects.map((project) => (
             <Grid item xs={12} sm={6} md={4} key={project.id}>
               <Paper
                 component={motion.div}
-                whileHover={{
-                  scale: 1.05,
-                  boxShadow: "0px 8px 24px rgba(0, 0, 0, 0.2)",
-                }}
+                whileHover={{ scale: 1.05, boxShadow: "0px 8px 24px rgba(0,0,0,0.2)" }}
                 transition={{ type: "spring", stiffness: 300, damping: 20 }}
                 elevation={3}
                 sx={{
@@ -129,20 +127,17 @@ function Dashboard() {
                   cursor: "pointer",
                 }}
                 onClick={() => navigate(`/projects/${project.id}`)}
-
               >
                 {project.name}
               </Paper>
             </Grid>
           ))}
-
-          {/* Crear nuevo proyecto */}
           <Grid item xs={12} sm={6} md={4}>
             <Paper
               component={motion.div}
               whileHover={{
                 scale: 1.07,
-                boxShadow: "0px 12px 28px rgba(0, 0, 0, 0.25)",
+                boxShadow: "0px 12px 28px rgba(0,0,0,0.25)",
               }}
               transition={{ type: "spring", stiffness: 250, damping: 15 }}
               elevation={3}
@@ -169,14 +164,12 @@ function Dashboard() {
             </Paper>
           </Grid>
         </Grid>
+
         {selectedProjectId && (
-          <ProjectStats
-            totalTasks={projectStats.totalTasks}
-            completedTasks={projectStats.completedTasks}
-            userTasks={projectStats.userTasks}
-            recentActivity={projectStats.recentActivity}
-          />
-        )}<CreateProjectModal
+          <ProjectStats {...projectStats} />
+        )}
+
+        <CreateProjectModal
           open={modalOpen}
           onClose={() => setModalOpen(false)}
           onCreate={handleProjectSubmit}

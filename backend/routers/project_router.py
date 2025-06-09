@@ -44,8 +44,13 @@ async def get_project(project_id: int):
 
 @router.get("/projects/by_user/{user_id}")
 async def get_projects_by_user(user_id: int):
-    query = select(Project).where(Project.created_by == user_id)
+    query = (
+        select(Project)
+        .join(ProjectUser, Project.id == ProjectUser.project_id)
+        .where(ProjectUser.user_id == user_id)
+    )
     return await database.fetch_all(query)
+
 
 @router.get("/projects/{project_id}/users")
 async def get_project_users(project_id: int):

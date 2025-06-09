@@ -121,3 +121,27 @@ export const deleteComment = async (commentId, userId) => {
     );
     return response.data;
 };
+
+export const inviteUserToProject = async (projectId, invitedName, invitedById) => {
+    const response = await axios.post(`${API_BASE_URL}/projects/invite`, {
+        project_id: projectId,
+        invited_name: invitedName,
+        invited_by: invitedById
+    });
+    return response.data;
+};
+
+export const fetchUserInvitations = async (userId) => {
+    const res = await axios.get(`${API_BASE_URL}/users/${userId}/invitations`);
+    return res.data;
+};
+
+export const acceptInvitation = async (invitationId) => {
+    const res = await axios.post(`${API_BASE_URL}/invitations/${invitationId}/accept`);
+    return res.data;
+};
+
+export const rejectInvitation = async (invitationId) => {
+    const res = await axios.post(`${API_BASE_URL}/invitations/${invitationId}/reject`);
+    return res.data;
+};

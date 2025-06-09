@@ -6,7 +6,7 @@ import { use, useEffect, useState } from "react";
 import {
     fetchProjectById, fetchTasksByProject, createTask, updateTask,
     fetchUsersByProject, deleteTask, removeUserFromProject, addUserToProject,
-    fetchUsers
+    fetchUsers, inviteUserToProject
 } from "../services/api";
 import { useProjectStats } from "../hooks/useProjectStats";
 import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
@@ -17,7 +17,7 @@ import TaskFilters from "../components/TaskFilters";
 import TaskList from "../components/TaskList";
 import ProjectMembers from "../components/ProjectMembers";
 import AppHeader from "../components/AppHeader";
-
+import PendingInvitations from "../components/PendingInvitations";
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
@@ -65,12 +65,13 @@ function ProjectDashboard() {
         }
     };
 
-    const handleAddUser = async (userId) => {
+    const handleInviteUser = async (username) => {
         try {
-            await addUserToProject(projectId, userId);
-            await loadProjectUsers();
+            await inviteUserToProject(projectId, username, userId);
+            alert(`Invitación enviada a ${username}`);
         } catch (err) {
-            console.error("Error al agregar usuario al proyecto", err);
+            console.error("Error al invitar:", err);
+            alert(err.response?.data?.detail || "Error al enviar la invitación.");
         }
     };
 
@@ -121,13 +122,16 @@ function ProjectDashboard() {
     return (
         <>
             <AppHeader />
+            <Box sx={{ mb: 4 }}>
+                <PendingInvitations userId={userId} onHandled={loadProjectUsers} />
+            </Box>
             <Box sx={{ px: 4, py: 6 }}>
                 <ProjectDetailsHeader name={project.name} description={project.description} />
 
                 <ProjectMembers
                     allUsers={users}
                     projectUsers={projectUsers}
-                    onAddUser={handleAddUser}
+                    onAddUser={handleInviteUser}
                     onRemoveUser={handleRemoveUser}
                 />
 

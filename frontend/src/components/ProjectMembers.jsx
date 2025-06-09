@@ -2,26 +2,37 @@ import {
     Box,
     Typography,
     TextField,
-    MenuItem,
     Button,
     Chip,
-    Stack
+    Stack,
+    Alert,
 } from "@mui/material";
 import { useState } from "react";
+import { fetchUsers } from "../services/api"; // Para buscar si existe
 
 const ProjectMembers = ({ allUsers, projectUsers, onAddUser, onRemoveUser }) => {
-    const [selectedUser, setSelectedUser] = useState("");
+    const [inputName, setInputName] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
-    const handleAdd = () => {
-        if (selectedUser) {
-            onAddUser(parseInt(selectedUser));
-            setSelectedUser("");
+    const handleAdd = async () => {
+        setErrorMessage("");
+        const found = allUsers.find(
+            (u) => u.name.toLowerCase() === inputName.trim().toLowerCase()
+        );
+        if (!found) {
+            setErrorMessage(
+                `No existe ningún usuario llamado "${inputName}".`
+            );
+            return;
         }
+        if (projectUsers.some((u) => u.id === found.id)) {
+            setErrorMessage(`${found.name} ya está en el proyecto.`);
+            setInputName("");
+            return;
+        }
+        await onAddUser(found.name);
+        setInputName("");
     };
-
-    const availableUsers = allUsers.filter(
-        user => !projectUsers.some(u => u.id === user.id)
-    );
 
     return (
         <Box sx={{ mt: 4 }}>
@@ -31,35 +42,39 @@ const ProjectMembers = ({ allUsers, projectUsers, onAddUser, onRemoveUser }) => 
 
             <Stack direction="row" spacing={2} alignItems="center" sx={{ mb: 2 }}>
                 <TextField
-                    select
-                    label="Agregar miembro"
-                    value={selectedUser}
-                    onChange={(e) => setSelectedUser(e.target.value)}
+                    label="Invitar por nombre"
+                    value={inputName}
+                    onChange={(e) => setInputName(e.target.value)}
+                    placeholder="Escribe el nombre del usuario..."
                     sx={{ minWidth: 240 }}
-                >
-                    {availableUsers.map(user => (
-                        <MenuItem key={user.id} value={user.id}>
-                            {user.name}
-                        </MenuItem>
-                    ))}
-                </TextField>
+                />
                 <Button
                     variant="contained"
                     color="primary"
                     onClick={handleAdd}
-                    disabled={!selectedUser}
+                    disabled={!inputName.trim()}
                 >
                     Agregar
                 </Button>
             </Stack>
 
+            {errorMessage && (
+                <Alert
+                    severity="error"
+                    onClose={() => setErrorMessage("")}
+                    sx={{ mb: 2 }}
+                >
+                    {errorMessage}
+                </Alert>
+            )}
+
             <Stack direction="row" spacing={1} flexWrap="wrap">
-                {projectUsers.map(user => (
+                {projectUsers.map((user) => (
                     <Chip
                         key={user.id}
                         label={user.name}
                         color="info"
-                        onDelete={() => onRemoveUser(user.id)} // ✅ Se pasa al padre
+                        onDelete={() => onRemoveUser(user.id)}
                         sx={{ mb: 1 }}
                     />
                 ))}

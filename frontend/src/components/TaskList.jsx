@@ -1,5 +1,6 @@
 import { Box, Typography, Grid } from "@mui/material";
 import TaskCard from "./TaskCard";
+import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
 
 const getUrgency = (dueDateStr) => {
     if (!dueDateStr) return "normal";
@@ -58,9 +59,12 @@ const TaskList = ({
     return (
         <Box sx={{ mt: 4 }}>
             {totalFiltradas === 0 ? (
-                <Typography variant="body1" sx={{ mt: 2, textAlign: "center", color: "text.secondary" }}>
-                    No hay tareas que coincidan con los filtros seleccionados.
-                </Typography>
+                <Box sx={{ textAlign: "center", mt: 4, color: "text.secondary" }}>
+                    <SentimentDissatisfiedIcon sx={{ fontSize: 48, mb: 1 }} />
+                    <Typography variant="h6">
+                        No hay tareas que coincidan con los filtros seleccionados.
+                    </Typography>
+                </Box>
             ) : (
                 <>
                     {renderGroup("🎉 Vencidas", vencidas)}
@@ -70,6 +74,7 @@ const TaskList = ({
             )}
         </Box>
     );
+
 };
 
 export default TaskList;
