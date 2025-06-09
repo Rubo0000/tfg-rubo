@@ -32,6 +32,7 @@ const TaskList = ({
     const vencidas = filtered.filter(t => getUrgency(t.due_date) === "overdue");
     const proximas = filtered.filter(t => getUrgency(t.due_date) === "upcoming");
     const otras = filtered.filter(t => getUrgency(t.due_date) === "normal");
+    const totalFiltradas = vencidas.length + proximas.length + otras.length;
 
     const renderGroup = (titulo, tareas) => (
         tareas.length > 0 && (
@@ -56,9 +57,17 @@ const TaskList = ({
 
     return (
         <Box sx={{ mt: 4 }}>
-            {renderGroup("🎉 Vencidas", vencidas)}
-            {renderGroup("⚠️ Próximas (≤ 3 días)", proximas)}
-            {renderGroup("📌 Otras tareas", otras)}
+            {totalFiltradas === 0 ? (
+                <Typography variant="body1" sx={{ mt: 2, textAlign: "center", color: "text.secondary" }}>
+                    No hay tareas que coincidan con los filtros seleccionados.
+                </Typography>
+            ) : (
+                <>
+                    {renderGroup("🎉 Vencidas", vencidas)}
+                    {renderGroup("⚠️ Próximas (≤ 3 días)", proximas)}
+                    {renderGroup("📌 Otras tareas", otras)}
+                </>
+            )}
         </Box>
     );
 };
