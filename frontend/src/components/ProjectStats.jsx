@@ -39,8 +39,6 @@ function ProjectStats({ totalTasks = 0, completedTasks = 0, userTasks = 0, recen
             </Typography>
 
             <Divider sx={{ my: 3 }} />
-
-            {/* Contribución del usuario */}
             <Typography variant="subtitle2">Tu contribución:</Typography>
             <Typography variant="body2" color="text.secondary">
                 {userContribution}% de las tareas
@@ -48,7 +46,6 @@ function ProjectStats({ totalTasks = 0, completedTasks = 0, userTasks = 0, recen
 
             <Divider sx={{ my: 3 }} />
 
-            {/* Actividad reciente */}
             <Typography variant="subtitle2" gutterBottom>
                 Actividad reciente:
             </Typography>

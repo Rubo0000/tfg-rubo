@@ -70,23 +70,6 @@ function ProjectOverview({ completedTasks, totalTasks, contributions, recentActi
                     <Bar data={barData} />
                 </Paper>
             </Grid>
-
-            <Grid item xs={12}>
-                <Paper sx={{ p: 3, borderRadius: 3 }}>
-                    <Typography variant="h6" gutterBottom>
-                        Actividad reciente
-                    </Typography>
-                    {recentActivity.length === 0 ? (
-                        <Typography variant="body2">Sin actividad reciente</Typography>
-                    ) : (
-                        recentActivity.map((entry, index) => (
-                            <Typography key={index} variant="body2" sx={{ mb: 1 }}>
-                                • {entry}
-                            </Typography>
-                        ))
-                    )}
-                </Paper>
-            </Grid>
         </Grid>
     );
 }
