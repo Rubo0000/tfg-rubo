@@ -18,8 +18,8 @@ const CreateTaskModal = ({ open, onClose, onCreate, projectId, users, initialDat
         title: "",
         description: "",
         due_date: "",
-        priority: "media",
-        status: "pendiente",
+        priority: "",
+        status: "",
         assigned_to: "",
     });
 
@@ -34,8 +34,8 @@ const CreateTaskModal = ({ open, onClose, onCreate, projectId, users, initialDat
                 title: "",
                 description: "",
                 due_date: "",
-                priority: "media",
-                status: "pendiente",
+                priority: "",
+                status: "",
                 assigned_to: "",
             });
         }
@@ -53,6 +53,14 @@ const CreateTaskModal = ({ open, onClose, onCreate, projectId, users, initialDat
         };
         onCreate(payload);
         onClose();
+        setForm({
+            title: "",
+            description: "",
+            due_date: "",
+            priority: "",
+            status: "",
+            assigned_to: "",
+        });
     };
 
     return (
