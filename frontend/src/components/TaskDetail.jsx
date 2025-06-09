@@ -1,4 +1,4 @@
-// components/TaskDetail.jsx
+// TaskDetail.jsx
 import {
     Box,
     Typography,
@@ -21,7 +21,13 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
-import { fetchTaskById, fetchCommentsByTaskId, addCommentToTask, deleteComment } from "../services/api";
+import {
+    fetchTaskById,
+    fetchCommentsByTaskId,
+    addCommentToTask,
+    deleteComment,
+    fetchUsers // 👈 AÑADIDO
+} from "../services/api";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CommentIcon from "@mui/icons-material/Comment";
 import HistoryIcon from "@mui/icons-material/History";
@@ -29,24 +35,39 @@ import InfoIcon from "@mui/icons-material/Info";
 import { format } from "date-fns";
 import AttachmentsSection from "./AttachmentsSection";
 import AppHeader from "./AppHeader";
+
 const TaskDetail = () => {
     const { taskId } = useParams();
     const [task, setTask] = useState(null);
     const [comments, setComments] = useState([]);
     const [tabIndex, setTabIndex] = useState(0);
     const [newComment, setNewComment] = useState("");
+    const [userMap, setUserMap] = useState({}); // 👈 AÑADIDO
     const userId = parseInt(localStorage.getItem("userId"));
+
     useEffect(() => {
         const loadTask = async () => {
             const data = await fetchTaskById(taskId);
             setTask(data);
         };
+
         const loadComments = async () => {
             const data = await fetchCommentsByTaskId(taskId);
             setComments(data);
         };
+
+        const loadUsers = async () => {
+            const users = await fetchUsers();
+            const map = {};
+            users.forEach(user => {
+                map[user.id] = user.name;
+            });
+            setUserMap(map);
+        };
+
         loadTask();
         loadComments();
+        loadUsers(); // 👈 AÑADIDO
     }, [taskId]);
 
     const handleAddComment = async () => {
@@ -75,8 +96,8 @@ const TaskDetail = () => {
                 <Stack direction="row" spacing={1} sx={{ mb: 2 }}>
                     <Chip label={task.status} color="primary" />
                     <Chip label={task.priority} color="secondary" />
-                    <Chip label={`Asignado a: ${task.assigned_to_name}`} />
-                    <Chip label={`Fecha límite: ${format(new Date(task.due_date), 'dd/MM/yyyy')}`} />
+                    <Chip label={`Asignado a: ${userMap[task.assigned_to] || "Nadie"}`} />
+                    <Chip label={`Fecha límite: ${format(new Date(task.due_date), "dd/MM/yyyy")}`} />
                 </Stack>
                 <Paper elevation={3} sx={{ p: 2 }}>
                     <Tabs value={tabIndex} onChange={(e, newValue) => setTabIndex(newValue)} aria-label="task detail tabs">
@@ -135,7 +156,6 @@ const TaskDetail = () => {
                         </Box>
                     )}
                     {tabIndex === 2 && <AttachmentsSection taskId={task.id} />}
-
                     {tabIndex === 3 && (
                         <Box>
                             <Typography>Historial de cambios (en desarrollo)</Typography>
