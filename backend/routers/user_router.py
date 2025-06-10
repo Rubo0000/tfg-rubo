@@ -11,6 +11,7 @@ class UserIn(BaseModel):
     name: str
     email: str
     password: str
+    role: str = "student"
 
 
 @router.post("/users")
@@ -19,7 +20,8 @@ async def create_user(user: UserIn):
     query = insert(User).values(
         name=user.name,
         email=user.email,
-        password=hashed_pwd
+        password=hashed_pwd,
+        role=user.role
     )
     print(hashed_pwd)
     try:
