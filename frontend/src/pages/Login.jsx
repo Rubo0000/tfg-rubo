@@ -4,8 +4,6 @@ import {
   Button,
   TextField,
   Typography,
-  Snackbar,
-  Alert,
   CircularProgress,
   IconButton,
   InputAdornment,
@@ -19,7 +17,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
-import AuthFormContainer from "../components/AuthFormContainer"; // Importa el nuevo componente
+import AuthFormContainer from "../components/AuthFormContainer";
+import AuthSnackbar from "../components/AuthSnackbar"; // Importa el nuevo componente
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -179,7 +178,7 @@ export default function Login() {
               transition: 'transform 0.2s ease-in-out',
               "&:hover": {
                 background: "linear-gradient(to right, #fda085, #f6d365)",
-                transform: 'translateY(-3px)',
+                transform: 'translateY(-2px)',
                 boxShadow: '0px 6px 15px rgba(253, 160, 133, 0.6)',
               },
               "&:disabled": {
@@ -202,20 +201,12 @@ export default function Login() {
         </Box>
       </AuthFormContainer>
 
-      <Snackbar
+      <AuthSnackbar
         open={openSnackbar}
-        autoHideDuration={2500}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
         onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setOpenSnackbar(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      />
     </Box>
   );
 }

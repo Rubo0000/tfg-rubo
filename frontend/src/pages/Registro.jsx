@@ -4,8 +4,6 @@ import {
   Button,
   TextField,
   Typography,
-  Snackbar,
-  Alert,
   FormControl,
   InputLabel,
   Select,
@@ -24,7 +22,8 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
-import AuthFormContainer from "../components/AuthFormContainer"; // Importa el nuevo componente
+import AuthFormContainer from "../components/AuthFormContainer";
+import AuthSnackbar from "../components/AuthSnackbar"; // Importa el nuevo componente
 
 export default function Registro() {
   const [form, setForm] = useState({
@@ -306,13 +305,6 @@ export default function Registro() {
               color: "#000",
               "&:hover": {
                 background: "linear-gradient(to right, #9face6, #74ebd5)",
-                transform: 'translateY(-1px)',
-                boxShadow: '0px 6px 15px rgba(112, 127, 212, 0.6)',
-              },
-              "&:disabled": {
-                background: '#e0e0e0',
-                color: '#a0a0a0',
-                boxShadow: 'none',
               },
               position: 'relative',
             }}
@@ -329,20 +321,12 @@ export default function Registro() {
         </Box>
       </AuthFormContainer>
 
-      <Snackbar
+      <AuthSnackbar
         open={openSnackbar}
-        autoHideDuration={2500}
+        message={snackbarMessage}
+        severity={snackbarSeverity}
         onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-      >
-        <Alert
-          onClose={() => setOpenSnackbar(false)}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {snackbarMessage}
-        </Alert>
-      </Snackbar>
+      />
     </Box>
   );
 }
