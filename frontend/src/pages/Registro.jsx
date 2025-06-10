@@ -18,8 +18,6 @@ import {
   CircularProgress,
   IconButton,
   InputAdornment,
-  AppBar,
-  Toolbar,
 } from "@mui/material";
 import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 import EmailIcon from "@mui/icons-material/Email";
@@ -27,10 +25,9 @@ import LockIcon from "@mui/icons-material/Lock";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import HomeIcon from "@mui/icons-material/Home";
-import TaskAltIcon from "@mui/icons-material/TaskAlt";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthHeader from "../components/AuthHeader";
 
 export default function Registro() {
   const [form, setForm] = useState({
@@ -38,7 +35,7 @@ export default function Registro() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "student", // Cambié "user" por "student" para coincidir con el Select
+    role: "student",
   });
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
@@ -140,52 +137,7 @@ export default function Registro() {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      {/* Header minimalista */}
-      <AppBar
-        position="static"
-        elevation={0}
-        sx={{
-          backgroundColor: "transparent",
-          borderBottom: "1px solid #e2e8f0",
-          mb: 4
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* Logo/Nombre de la app */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <TaskAltIcon sx={{ color: "#3b82f6", fontSize: 28 }} />
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: "bold",
-                color: "#1e293b",
-                fontFamily: "'Poppins', sans-serif"
-              }}
-            >
-              TaskManager
-            </Typography>
-          </Box>
-
-          {/* Botón para volver al inicio */}
-          <Button
-            startIcon={<HomeIcon />}
-            onClick={() => navigate("/")}
-            sx={{
-              color: "#64748b",
-              textTransform: "none",
-              fontWeight: 500,
-              borderRadius: 3,
-              px: 3,
-              "&:hover": {
-                backgroundColor: "#f1f5f9",
-                color: "#3b82f6",
-              },
-            }}
-          >
-            Volver al inicio
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <AuthHeader />
 
       <Container maxWidth="sm" sx={{ pt: 4 }}>
         <Paper elevation={6} sx={{ p: 5, borderRadius: 8, overflow: 'hidden' }}>

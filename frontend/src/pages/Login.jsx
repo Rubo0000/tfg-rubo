@@ -1,3 +1,4 @@
+// Login.jsx
 import {
   Box,
   Button,
@@ -14,18 +15,15 @@ import {
   IconButton,
   InputAdornment,
   Link,
-  AppBar,
-  Toolbar,
 } from "@mui/material";
 import LockOpenIcon from "@mui/icons-material/LockOpen";
 import EmailIcon from "@mui/icons-material/Email";
 import LockIcon from "@mui/icons-material/Lock";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import HomeIcon from "@mui/icons-material/Home";
-import TaskAltIcon from "@mui/icons-material/TaskAlt"; // Icono para el logo de la app
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import AuthHeader from "../components/AuthHeader"; // Importa el nuevo componente
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -110,52 +108,7 @@ export default function Login() {
 
   return (
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
-      {/* Header minimalista */}
-      <AppBar
-        position="static"
-        elevation={0}
-        sx={{
-          backgroundColor: "transparent",
-          borderBottom: "1px solid #e2e8f0",
-          mb: 4
-        }}
-      >
-        <Toolbar sx={{ justifyContent: "space-between" }}>
-          {/* Logo/Nombre de la app */}
-          <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-            <TaskAltIcon sx={{ color: "#3b82f6", fontSize: 28 }} />
-            <Typography
-              variant="h6"
-              sx={{
-                fontWeight: "bold",
-                color: "#1e293b",
-                fontFamily: "'Poppins', sans-serif"
-              }}
-            >
-              TaskManager
-            </Typography>
-          </Box>
-
-          {/* Botón para volver al inicio */}
-          <Button
-            startIcon={<HomeIcon />}
-            onClick={() => navigate("/")}
-            sx={{
-              color: "#64748b",
-              textTransform: "none",
-              fontWeight: 500,
-              borderRadius: 3,
-              px: 3,
-              "&:hover": {
-                backgroundColor: "#f1f5f9",
-                color: "#3b82f6",
-              },
-            }}
-          >
-            Volver al inicio
-          </Button>
-        </Toolbar>
-      </AppBar>
+      <AuthHeader />
 
       <Container maxWidth="sm" sx={{ pt: 4 }}>
         <Paper elevation={8} sx={{ p: 5, borderRadius: 8, overflow: 'hidden', boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)' }}>
