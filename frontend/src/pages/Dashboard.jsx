@@ -20,6 +20,7 @@ import { useNavigate } from "react-router-dom";
 import CreateProjectModal from "../components/CreateProjectModal";
 import AppHeader from "../components/AppHeader";
 import PendingInvitations from "../components/PendingInvitations";
+import UserProfile from "../components/UserProfile"; // Importamos el componente UserProfile
 
 function Dashboard() {
   const theme = useTheme();
@@ -29,6 +30,7 @@ function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false); // Estado para controlar la apertura del perfil
   const [projectStats, setProjectStats] = useState({
     totalTasks: 0,
     completedTasks: 0,
@@ -91,9 +93,24 @@ function Dashboard() {
     }
   };
 
+  // Función para abrir el perfil de usuario
+  const handleOpenProfile = () => {
+    setProfileOpen(true);
+  };
+
+  // Función para cerrar el perfil de usuario
+  const handleCloseProfile = () => {
+    setProfileOpen(false);
+  };
+
   return (
     <>
-      <AppHeader />
+      {/* Pasamos la función para abrir el perfil al AppHeader */}
+      <AppHeader onOpenProfile={handleOpenProfile} />
+
+      {/* Modal del perfil de usuario */}
+      <UserProfile open={profileOpen} onClose={handleCloseProfile} />
+
       <Box sx={{ px: 4, py: 6 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>
           ¡Bienvenido de nuevo! 👋

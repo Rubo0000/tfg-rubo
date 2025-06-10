@@ -66,6 +66,9 @@ function ProjectDashboard() {
         }
     };
 
+    const handleOpenProfile = () => {
+        setProfileOpen(true);
+    };
     const handleInviteUser = async (username) => {
         try {
             await inviteUserToProject(projectId, username, userId);
@@ -122,7 +125,7 @@ function ProjectDashboard() {
 
     return (
         <>
-            <AppHeader />
+            <AppHeader onOpenProfile={handleOpenProfile} />
             <Box sx={{ mb: 4 }}>
                 <PendingInvitations userId={userId} onHandled={loadProjectUsers} />
             </Box>
