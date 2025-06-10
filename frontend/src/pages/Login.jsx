@@ -2,13 +2,8 @@
 import {
   Box,
   Button,
-  Container,
-  Paper,
   TextField,
   Typography,
-  Avatar,
-  Divider,
-  Stack,
   Snackbar,
   Alert,
   CircularProgress,
@@ -23,7 +18,8 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthHeader from "../components/AuthHeader"; // Importa el nuevo componente
+import AuthHeader from "../components/AuthHeader";
+import AuthFormContainer from "../components/AuthFormContainer"; // Importa el nuevo componente
 
 export default function Login() {
   const [form, setForm] = useState({ email: "", password: "" });
@@ -110,127 +106,116 @@ export default function Login() {
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <AuthHeader />
 
-      <Container maxWidth="sm" sx={{ pt: 4 }}>
-        <Paper elevation={8} sx={{ p: 5, borderRadius: 8, overflow: 'hidden', boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.1)' }}>
-          <Stack spacing={2} alignItems="center" sx={{ mb: 3 }}>
-            <Avatar sx={{ bgcolor: "#FFC107", width: 64, height: 64, boxShadow: '0px 4px 15px rgba(255, 193, 7, 0.4)' }}>
-              <LockOpenIcon sx={{ fontSize: 36 }} />
-            </Avatar>
-            <Typography variant="h4" fontWeight="bold" color="primary.main">
-              Bienvenido
-            </Typography>
-            <Typography variant="h6" color="text.secondary">
-              Accede a tu cuenta
-            </Typography>
-          </Stack>
-
-          <Divider sx={{ mb: 3 }} />
-
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-          >
-            <TextField
-              label="Email"
-              name="email"
-              type="email"
-              variant="outlined"
-              fullWidth
-              onChange={handleChange}
-              required
-              InputProps={{
-                startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
-              }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
-            />
-
-            <TextField
-              label="Contraseña"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              fullWidth
-              onChange={handleChange}
-              required
-              InputProps={{
-                startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
-            />
-
-            <Box sx={{ alignSelf: 'flex-end', mt: -2 }}>
-              <Link href="/forgot-password" variant="body2" underline="hover" color="primary.main">
-                ¿Olvidaste tu contraseña?
-              </Link>
-            </Box>
-
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={loading || !isFormValid}
-              sx={{
-                mt: 1,
-                borderRadius: 5,
-                background: "linear-gradient(to right, #f6d365, #fda085)",
-                fontWeight: "bold",
-                color: "#000",
-                boxShadow: '0px 4px 10px rgba(253, 160, 133, 0.4)',
-                transition: 'transform 0.2s ease-in-out',
-                "&:hover": {
-                  background: "linear-gradient(to right, #fda085, #f6d365)",
-                  transform: 'translateY(-2px)',
-                  boxShadow: '0px 6px 15px rgba(253, 160, 133, 0.6)',
-                },
-                "&:disabled": {
-                  background: '#e0e0e0',
-                  color: '#a0a0a0',
-                  boxShadow: 'none',
-                },
-                position: 'relative',
-              }}
-            >
-              {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : "INICIAR SESIÓN"}
-            </Button>
-
-            <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-              ¿No tienes una cuenta?{" "}
-              <Link href="/registro" underline="hover">
-                Regístrate aquí
-              </Link>
-            </Typography>
-          </Box>
-        </Paper>
-
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={2500}
-          onClose={() => setOpenSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      <AuthFormContainer
+        avatarIcon={<LockOpenIcon sx={{ fontSize: 36 }} />}
+        avatarBgColor="#FFC107"
+        title="Bienvenido"
+        subtitle="Accede a tu cuenta"
+      >
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
         >
-          <Alert
-            onClose={() => setOpenSnackbar(false)}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
+          <TextField
+            label="Email"
+            name="email"
+            type="email"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            required
+            InputProps={{
+              startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          />
+
+          <TextField
+            label="Contraseña"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            required
+            InputProps={{
+              startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          />
+
+          <Box sx={{ alignSelf: 'flex-end', mt: -2 }}>
+            <Link href="/forgot-password" variant="body2" underline="hover" color="primary.main">
+              ¿Olvidaste tu contraseña?
+            </Link>
+          </Box>
+
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            fullWidth
+            disabled={loading || !isFormValid}
+            sx={{
+              mt: 1,
+              borderRadius: 5,
+              background: "linear-gradient(to right, #f6d365, #fda085)",
+              fontWeight: "bold",
+              color: "#000",
+              boxShadow: '0px 4px 10px rgba(253, 160, 133, 0.4)',
+              transition: 'transform 0.2s ease-in-out',
+              "&:hover": {
+                background: "linear-gradient(to right, #fda085, #f6d365)",
+                transform: 'translateY(-3px)',
+                boxShadow: '0px 6px 15px rgba(253, 160, 133, 0.6)',
+              },
+              "&:disabled": {
+                background: '#e0e0e0',
+                color: '#a0a0a0',
+                boxShadow: 'none',
+              },
+              position: 'relative',
+            }}
           >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-      </Container>
+            {loading ? <CircularProgress size={24} sx={{ color: '#fff' }} /> : "INICIAR SESIÓN"}
+          </Button>
+
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
+            ¿No tienes una cuenta?{" "}
+            <Link href="/registro" underline="hover">
+              Regístrate aquí
+            </Link>
+          </Typography>
+        </Box>
+      </AuthFormContainer>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2500}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }

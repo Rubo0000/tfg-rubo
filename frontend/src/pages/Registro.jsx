@@ -1,13 +1,9 @@
+// Registro.jsx
 import {
   Box,
   Button,
-  Container,
-  Paper,
   TextField,
   Typography,
-  Avatar,
-  Divider,
-  Stack,
   Snackbar,
   Alert,
   FormControl,
@@ -28,6 +24,7 @@ import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthHeader from "../components/AuthHeader";
+import AuthFormContainer from "../components/AuthFormContainer"; // Importa el nuevo componente
 
 export default function Registro() {
   const [form, setForm] = useState({
@@ -139,216 +136,213 @@ export default function Registro() {
     <Box sx={{ minHeight: "100vh", backgroundColor: "#f8fafc" }}>
       <AuthHeader />
 
-      <Container maxWidth="sm" sx={{ pt: 4 }}>
-        <Paper elevation={6} sx={{ p: 5, borderRadius: 8, overflow: 'hidden' }}>
-          <Stack spacing={2} alignItems="center" sx={{ mb: 3 }}>
-            <Avatar sx={{ bgcolor: "#1976d2", width: 56, height: 56 }}>
-              <PersonAddAltIcon />
-            </Avatar>
-            <Typography variant="h4" fontWeight="bold">
-              Crear cuenta
-            </Typography>
-            <Typography variant="body2" color="text.secondary">
-              Comienza a gestionar tus proyectos fácilmente
-            </Typography>
-          </Stack>
+      <AuthFormContainer
+        avatarIcon={<PersonAddAltIcon sx={{ fontSize: 36 }} />}
+        avatarBgColor="#1976d2"
+        title="Crear cuenta"
+        subtitle="Comienza a gestionar tus proyectos fácilmente"
+        titleColor="text.primary"
+      >
+        <Box
+          component="form"
+          onSubmit={handleSubmit}
+          sx={{ display: "flex", flexDirection: "column", gap: 3 }}
+        >
+          <TextField
+            label="Nombre completo"
+            name="nombre"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            required
+            InputProps={{
+              startAdornment: <AccountCircleIcon sx={{ mr: 1, color: 'action.active' }} />,
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          />
 
-          <Divider sx={{ mb: 3 }} />
+          <TextField
+            label="Email institucional"
+            name="email"
+            type="email"
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            required
+            InputProps={{
+              startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          />
 
-          <Box
-            component="form"
-            onSubmit={handleSubmit}
-            sx={{ display: "flex", flexDirection: "column", gap: 3 }}
-          >
-            <TextField
-              label="Nombre completo"
-              name="nombre"
-              variant="outlined"
-              fullWidth
+          <TextField
+            label="Contraseña"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            required
+            InputProps={{
+              startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle password visibility"
+                    onClick={handleClickShowPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          />
+
+          <TextField
+            label="Confirmar contraseña"
+            name="confirmPassword"
+            type={showConfirmPassword ? "text" : "password"}
+            variant="outlined"
+            fullWidth
+            onChange={handleChange}
+            required
+            error={!!passwordError}
+            helperText={passwordError}
+            InputProps={{
+              startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton
+                    aria-label="toggle confirm password visibility"
+                    onClick={handleClickShowConfirmPassword}
+                    onMouseDown={handleMouseDownPassword}
+                    edge="end"
+                  >
+                    {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          />
+
+          <FormControl fullWidth variant="outlined" sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}>
+            <InputLabel id="role-label">Tipo de usuario</InputLabel>
+            <Select
+              labelId="role-label"
+              id="role"
+              name="role"
+              value={form.role}
+              label="Tipo de usuario"
               onChange={handleChange}
-              required
-              InputProps={{
-                startAdornment: <AccountCircleIcon sx={{ mr: 1, color: 'action.active' }} />,
+              MenuProps={{
+                PaperProps: {
+                  sx: {
+                    borderRadius: 4,
+                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                    marginTop: 1,
+                  },
+                },
               }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
-            />
-
-            <TextField
-              label="Email institucional"
-              name="email"
-              type="email"
-              variant="outlined"
-              fullWidth
-              onChange={handleChange}
-              required
-              InputProps={{
-                startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
-              }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
-            />
-
-            <TextField
-              label="Contraseña"
-              name="password"
-              type={showPassword ? "text" : "password"}
-              variant="outlined"
-              fullWidth
-              onChange={handleChange}
-              required
-              InputProps={{
-                startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onClick={handleClickShowPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
-            />
-
-            <TextField
-              label="Confirmar contraseña"
-              name="confirmPassword"
-              type={showConfirmPassword ? "text" : "password"}
-              variant="outlined"
-              fullWidth
-              onChange={handleChange}
-              required
-              error={!!passwordError}
-              helperText={passwordError}
-              InputProps={{
-                startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle confirm password visibility"
-                      onClick={handleClickShowConfirmPassword}
-                      onMouseDown={handleMouseDownPassword}
-                      edge="end"
-                    >
-                      {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
-            />
-
-            <FormControl fullWidth variant="outlined" sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}>
-              <InputLabel id="role-label">Tipo de usuario</InputLabel>
-              <Select
-                labelId="role-label"
-                id="role"
-                name="role"
-                value={form.role}
-                label="Tipo de usuario"
-                onChange={handleChange}
-                MenuProps={{
-                  PaperProps: {
-                    sx: {
-                      borderRadius: 4,
-                      boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
-                      marginTop: 1,
-                    },
+            >
+              <MenuItem
+                value="student"
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  my: 0.5,
+                  '&:hover': {
+                    backgroundColor: '#e3f2fd',
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: '#bbdefb',
+                    fontWeight: 'bold',
                   },
                 }}
               >
-                <MenuItem
-                  value="student"
-                  sx={{
-                    borderRadius: 2,
-                    mx: 1,
-                    my: 0.5,
-                    '&:hover': {
-                      backgroundColor: '#e3f2fd',
-                    },
-                    '&.Mui-selected': {
-                      backgroundColor: '#bbdefb',
-                      fontWeight: 'bold',
-                    },
-                  }}
-                >
-                  Estudiante
-                </MenuItem>
-                <MenuItem
-                  value="teacher"
-                  sx={{
-                    borderRadius: 2,
-                    mx: 1,
-                    my: 0.5,
-                    '&:hover': {
-                      backgroundColor: '#e3f2fd',
-                    },
-                    '&.Mui-selected': {
-                      backgroundColor: '#bbdefb',
-                      fontWeight: 'bold',
-                    },
-                  }}
-                >
-                  Docente
-                </MenuItem>
-              </Select>
-            </FormControl>
+                Estudiante
+              </MenuItem>
+              <MenuItem
+                value="teacher"
+                sx={{
+                  borderRadius: 2,
+                  mx: 1,
+                  my: 0.5,
+                  '&:hover': {
+                    backgroundColor: '#e3f2fd',
+                  },
+                  '&.Mui-selected': {
+                    backgroundColor: '#bbdefb',
+                    fontWeight: 'bold',
+                  },
+                }}
+              >
+                Docente
+              </MenuItem>
+            </Select>
+          </FormControl>
 
-            <Typography variant="body2" color="text.secondary" align="center">
-              Al registrarte, aceptas nuestros{" "}
-              <Link href="/terms" underline="hover">
-                Términos y condiciones
-              </Link>
-            </Typography>
+          <Typography variant="body2" color="text.secondary" align="center">
+            Al registrarte, aceptas nuestros{" "}
+            <Link href="/terms" underline="hover">
+              Términos y condiciones
+            </Link>
+          </Typography>
 
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              fullWidth
-              disabled={loading || !isFormValid}
-              sx={{
-                mt: 1,
-                borderRadius: 5,
-                background: "linear-gradient(to right, #74ebd5, #9face6)",
-                fontWeight: "bold",
-                color: "#000",
-                "&:hover": {
-                  background: "linear-gradient(to right, #9face6, #74ebd5)",
-                },
-                position: 'relative',
-              }}
-            >
-              {loading ? <CircularProgress size={24} sx={{ color: '#000' }} /> : "REGISTRARSE"}
-            </Button>
-
-            <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
-              ¿Ya tienes una cuenta?{" "}
-              <Link href="/login" underline="hover">
-                Inicia sesión aquí
-              </Link>
-            </Typography>
-          </Box>
-        </Paper>
-
-        <Snackbar
-          open={openSnackbar}
-          autoHideDuration={2500}
-          onClose={() => setOpenSnackbar(false)}
-          anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        >
-          <Alert
-            onClose={() => setOpenSnackbar(false)}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            fullWidth
+            disabled={loading || !isFormValid}
+            sx={{
+              mt: 1,
+              borderRadius: 5,
+              background: "linear-gradient(to right, #74ebd5, #9face6)",
+              fontWeight: "bold",
+              color: "#000",
+              "&:hover": {
+                background: "linear-gradient(to right, #9face6, #74ebd5)",
+                transform: 'translateY(-1px)',
+                boxShadow: '0px 6px 15px rgba(112, 127, 212, 0.6)',
+              },
+              "&:disabled": {
+                background: '#e0e0e0',
+                color: '#a0a0a0',
+                boxShadow: 'none',
+              },
+              position: 'relative',
+            }}
           >
-            {snackbarMessage}
-          </Alert>
-        </Snackbar>
-      </Container>
+            {loading ? <CircularProgress size={24} sx={{ color: '#000' }} /> : "REGISTRARSE"}
+          </Button>
+
+          <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
+            ¿Ya tienes una cuenta?{" "}
+            <Link href="/login" underline="hover">
+              Inicia sesión aquí
+            </Link>
+          </Typography>
+        </Box>
+      </AuthFormContainer>
+
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={2500}
+        onClose={() => setOpenSnackbar(false)}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      >
+        <Alert
+          onClose={() => setOpenSnackbar(false)}
+          severity={snackbarSeverity}
+          sx={{ width: "100%" }}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </Box>
   );
 }
