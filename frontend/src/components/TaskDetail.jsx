@@ -1,4 +1,3 @@
-// TaskDetail.jsx
 import {
     Box,
     Typography,
@@ -8,25 +7,12 @@ import {
     Divider,
     Stack,
     Chip,
-    Avatar,
-    TextField,
-    Button,
-    List,
-    ListItem,
-    ListItemAvatar,
-    ListItemText,
-    IconButton,
 } from "@mui/material";
-
-import DeleteIcon from "@mui/icons-material/Delete";
 import { useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import {
     fetchTaskById,
-    fetchCommentsByTaskId,
-    addCommentToTask,
-    deleteComment,
-    fetchUsers // 👈 AÑADIDO
+    fetchUsers
 } from "../services/api";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CommentIcon from "@mui/icons-material/Comment";
@@ -34,26 +20,20 @@ import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import { format } from "date-fns";
 import AttachmentsSection from "./AttachmentsSection";
+import TaskComments from "./TaskComments";
+import TaskInfo from "./TaskInfo";
 import AppHeader from "./AppHeader";
 
 const TaskDetail = () => {
     const { taskId } = useParams();
     const [task, setTask] = useState(null);
-    const [comments, setComments] = useState([]);
     const [tabIndex, setTabIndex] = useState(0);
-    const [newComment, setNewComment] = useState("");
-    const [userMap, setUserMap] = useState({}); // 👈 AÑADIDO
-    const userId = parseInt(localStorage.getItem("userId"));
+    const [userMap, setUserMap] = useState({});
 
     useEffect(() => {
         const loadTask = async () => {
             const data = await fetchTaskById(taskId);
             setTask(data);
-        };
-
-        const loadComments = async () => {
-            const data = await fetchCommentsByTaskId(taskId);
-            setComments(data);
         };
 
         const loadUsers = async () => {
@@ -66,23 +46,8 @@ const TaskDetail = () => {
         };
 
         loadTask();
-        loadComments();
-        loadUsers(); // 👈 AÑADIDO
+        loadUsers();
     }, [taskId]);
-
-    const handleAddComment = async () => {
-        if (newComment.trim() === "") return;
-        await addCommentToTask(taskId, { content: newComment, user_id: userId });
-        const updatedComments = await fetchCommentsByTaskId(taskId);
-        setComments(updatedComments);
-        setNewComment("");
-    };
-
-    const handleDeleteComment = async (commentId) => {
-        await deleteComment(commentId, userId);
-        const updatedComments = await fetchCommentsByTaskId(taskId);
-        setComments(updatedComments);
-    };
 
     if (!task) return <Typography>Cargando...</Typography>;
 
@@ -107,54 +72,8 @@ const TaskDetail = () => {
                         <Tab label="Historial" icon={<HistoryIcon />} iconPosition="start" />
                     </Tabs>
                     <Divider sx={{ my: 2 }} />
-                    {tabIndex === 0 && (
-                        <Box>
-                            <Typography variant="h6">Descripción</Typography>
-                            <Typography>{task.description}</Typography>
-                        </Box>
-                    )}
-                    {tabIndex === 1 && (
-                        <Box>
-                            <List>
-                                {comments.map((comment) => (
-                                    <ListItem key={comment.id} alignItems="flex-start">
-                                        <ListItemAvatar>
-                                            <Avatar>{comment.author_name.charAt(0)}</Avatar>
-                                        </ListItemAvatar>
-                                        <ListItemText
-                                            primary={comment.author_name}
-                                            secondary={
-                                                <>
-                                                    <Typography component="span" variant="body2" color="text.primary">
-                                                        {format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm')}
-                                                    </Typography>
-                                                    {" — "}{comment.content}
-                                                </>
-                                            }
-                                        />
-                                        {comment.user_id === userId && (
-                                            <IconButton edge="end" aria-label="delete" onClick={() => handleDeleteComment(comment.id)}>
-                                                <DeleteIcon />
-                                            </IconButton>
-                                        )}
-                                    </ListItem>
-                                ))}
-                            </List>
-                            <TextField
-                                label="Nuevo comentario"
-                                multiline
-                                fullWidth
-                                rows={4}
-                                value={newComment}
-                                onChange={(e) => setNewComment(e.target.value)}
-                                variant="outlined"
-                                sx={{ mt: 2 }}
-                            />
-                            <Button variant="contained" sx={{ mt: 1 }} onClick={handleAddComment}>
-                                Añadir comentario
-                            </Button>
-                        </Box>
-                    )}
+                    {tabIndex === 0 && <TaskInfo description={task.description} />}
+                    {tabIndex === 1 && <TaskComments taskId={taskId} userMap={userMap} />}
                     {tabIndex === 2 && <AttachmentsSection taskId={task.id} />}
                     {tabIndex === 3 && (
                         <Box>

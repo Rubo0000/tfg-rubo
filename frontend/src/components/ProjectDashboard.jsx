@@ -37,6 +37,7 @@ function ProjectDashboard() {
     const loadTasks = async () => {
         const data = await fetchTasksByProject(projectId);
         setTasks(data);
+        console.log("Tareas del proyecto:", data);
     };
 
     const loadProjectUsers = async () => {
