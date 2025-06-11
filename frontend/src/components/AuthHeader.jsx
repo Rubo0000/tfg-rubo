@@ -28,7 +28,7 @@ export default function AuthHeader() {
                             fontFamily: "'Poppins', sans-serif"
                         }}
                     >
-                        TaskManager
+                        Project Manager
                     </Typography>
                 </Box>
                 <Button
