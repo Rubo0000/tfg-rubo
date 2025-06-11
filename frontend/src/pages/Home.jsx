@@ -3,7 +3,7 @@ import React from 'react';
 import { Box, Container, CssBaseline, Grid, Typography, ThemeProvider } from "@mui/material";
 import { BrowserRouter as Router } from "react-router-dom";
 import customTheme from "../theme/customTheme";
-import AppHeader from "../components/AppHeader";
+import LandPageHeader from "../components/LandPageHeader";
 import HeroSection from "../components/HeroSection";
 import FeatureCard from "../components/FeatureCard";
 import AppFooter from "../components/AppFooter";
@@ -14,7 +14,7 @@ function Home() {
     <ThemeProvider theme={customTheme}>
       <CssBaseline />
       <Box sx={{ bgcolor: customTheme.palette.background.default, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-        <AppHeader />
+        <LandPageHeader />
         <Container maxWidth="lg" sx={{ py: { xs: 4, md: 8 }, flexGrow: 1 }}>
           <HeroSection />
           <Box sx={{ my: { xs: 6, md: 10 }, textAlign: 'center' }}>
