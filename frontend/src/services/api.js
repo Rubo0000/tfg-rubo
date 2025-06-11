@@ -151,3 +151,7 @@ export const updateUser = async (userId, userData) => {
     console.log("User updated:", response.data);
     return response.data;
 };
+export const fetchCurrentUser = async () => {
+    const response = await axios.get(`${API_BASE_URL}/users/me`);
+    return response.data;
+};
