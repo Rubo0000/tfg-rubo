@@ -1,5 +1,14 @@
 from sqlalchemy import Column, Integer, String
 from database.db import Base
+from pydantic import BaseModel
+from typing import Optional
+
+class UserUpdate(BaseModel):
+    name: Optional[str]
+    email: Optional[str]
+    password: Optional[str]
+    role: Optional[str]
+    avatar: Optional[str]
 
 class User(Base):
     __tablename__ = "users"
@@ -9,3 +18,6 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
     role = Column(String, default="student",nullable=False)
+    avatar = Column(String, default="default_avatar.png", nullable=False)
+
+

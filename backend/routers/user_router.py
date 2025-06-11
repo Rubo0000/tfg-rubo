@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from database.db import database
 from models.user import User
-from sqlalchemy import insert, select
+from sqlalchemy import insert, select, update
 from pydantic import BaseModel
 from auth import hash_password
-
+from typing import Optional
 router = APIRouter()
 
 class UserIn(BaseModel):
@@ -13,6 +13,14 @@ class UserIn(BaseModel):
     password: str
     role: str = "student"
 
+class UserUpdate(BaseModel):
+    name: Optional[str]
+    password: Optional[str]
+    avatar: Optional[str]
+
+    class Config:
+        extra = "forbid"  # Rechaza campos no definidos explícitamente
+        orm_mode = True
 
 @router.post("/users")
 async def create_user(user: UserIn):
@@ -39,3 +47,20 @@ async def get_user(user_id: int):
     query = select(User).where(User.id == user_id)
     return await database.fetch_one(query)
     
+@router.put("/users/{user_id}")
+async def update_user(user_id: int, user: UserUpdate):
+    update_data = user.dict(exclude_unset=True)
+
+    if "password" in update_data:
+        update_data["password"] = hash_password(update_data["password"])
+
+    if not update_data:
+        raise HTTPException(status_code=400, detail="No hay campos válidos para actualizar.")
+
+    query = update(User).where(User.id == user_id).values(**update_data)
+
+    try:
+        await database.execute(query)
+        return {"message": "Usuario actualizado con éxito"}
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

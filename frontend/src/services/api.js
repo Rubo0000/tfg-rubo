@@ -145,3 +145,9 @@ export const rejectInvitation = async (invitationId) => {
     const res = await axios.post(`${API_BASE_URL}/invitations/${invitationId}/reject`);
     return res.data;
 };
+
+export const updateUser = async (userId, userData) => {
+    const response = await axios.put(`${API_BASE_URL}/users/${userId}`, userData);
+    console.log("User updated:", response.data);
+    return response.data;
+};

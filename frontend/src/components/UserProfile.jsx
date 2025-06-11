@@ -1,41 +1,16 @@
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    TextField,
-    Button,
-    Box,
-    Avatar,
-    Typography,
-    IconButton,
-    Grid,
-    Chip,
-    Divider,
-    FormControl,
-    InputLabel,
-    Select,
-    MenuItem,
-    Alert,
-    Snackbar,
-    useTheme,
-    alpha,
-    InputAdornment,
+    Dialog, DialogTitle, DialogContent, DialogActions,
+    TextField, Button, Box, Avatar, Typography, IconButton,
+    Grid, Chip, Divider, InputAdornment, Alert, Snackbar,
+    useTheme, alpha
 } from "@mui/material";
 import {
-    Close,
-    Edit,
-    Save,
-    Cancel,
-    Person,
-    Email,
-    School,
-    CameraAlt,
-    Badge,
-    CalendarToday,
+    Close, Edit, Save, Cancel, Person, Email,
+    CameraAlt, Badge, CalendarToday, Lock
 } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { updateUser } from "../services/api";
 
 function UserProfile({ open, onClose }) {
     const theme = useTheme();
@@ -44,49 +19,63 @@ function UserProfile({ open, onClose }) {
     const [snackbarMessage, setSnackbarMessage] = useState("");
     const [snackbarSeverity, setSnackbarSeverity] = useState("success");
 
-    // Datos del usuario (inicializar con localStorage o datos por defecto)
     const [userData, setUserData] = useState({
         name: localStorage.getItem("userName") || "Usuario",
         email: localStorage.getItem("userEmail") || "usuario@example.com",
         role: localStorage.getItem("userRole") || "student",
-        bio: localStorage.getItem("userBio") || "",
-        phone: localStorage.getItem("userPhone") || "",
-        institution: localStorage.getItem("userInstitution") || "",
+        avatar: localStorage.getItem("userAvatar") || "",
         joinDate: localStorage.getItem("userJoinDate") || new Date().toLocaleDateString(),
     });
 
-    const [editedData, setEditedData] = useState(userData);
+    const [editedData, setEditedData] = useState({ ...userData, password: "" });
 
     useEffect(() => {
         if (open) {
-            setEditedData(userData);
+            setEditedData({ ...userData, password: "" });
             setIsEditing(false);
         }
     }, [open, userData]);
 
-    const handleEdit = () => {
-        setIsEditing(true);
-    };
+    const handleEdit = () => setIsEditing(true);
 
     const handleCancel = () => {
-        setEditedData(userData);
+        setEditedData({ ...userData, password: "" });
         setIsEditing(false);
     };
 
     const handleSave = async () => {
         try {
-            // Aquí harías la llamada a la API para actualizar los datos
-            // Por ahora solo actualizo localStorage
-            Object.keys(editedData).forEach(key => {
-                localStorage.setItem(`user${key.charAt(0).toUpperCase() + key.slice(1)}`, editedData[key]);
+            const userId = localStorage.getItem("userId");
+
+            const allowedFields = ["name", "avatar"];
+            if (editedData.password?.trim()) {
+                allowedFields.push("password");
+            }
+
+            const payload = {};
+            allowedFields.forEach(field => {
+                if (editedData[field] !== undefined) {
+                    payload[field] = editedData[field];
+                }
             });
 
-            setUserData(editedData);
+            console.log("Saving user data:", payload);
+
+            await updateUser(userId, payload);
+
+            Object.keys(payload).forEach(key => {
+                if (key !== "password") {
+                    localStorage.setItem(`user${key.charAt(0).toUpperCase() + key.slice(1)}`, payload[key]);
+                }
+            });
+
+            setUserData(prev => ({ ...prev, ...payload }));
             setIsEditing(false);
             setSnackbarMessage("Perfil actualizado exitosamente");
             setSnackbarSeverity("success");
             setSnackbarOpen(true);
         } catch (error) {
+            console.error(error);
             setSnackbarMessage("Error al actualizar el perfil");
             setSnackbarSeverity("error");
             setSnackbarOpen(true);
@@ -94,34 +83,38 @@ function UserProfile({ open, onClose }) {
     };
 
     const handleInputChange = (field, value) => {
-        setEditedData(prev => ({
-            ...prev,
-            [field]: value
-        }));
+        setEditedData(prev => ({ ...prev, [field]: value }));
     };
 
-    const getRoleColor = (role) => {
-        return role === "teacher" ? "#4caf50" : "#2196f3";
-    };
-
-    const getRoleLabel = (role) => {
-        return role === "teacher" ? "Docente" : "Estudiante";
-    };
+    const getRoleColor = (role) => role === "teacher" ? "#4caf50" : "#2196f3";
+    const getRoleLabel = (role) => role === "teacher" ? "Docente" : "Estudiante";
 
     const handleAvatarClick = () => {
-        // Aquí podrías implementar la funcionalidad para cambiar la foto de perfil
-        setSnackbarMessage("Funcionalidad de cambio de avatar próximamente");
-        setSnackbarSeverity("info");
-        setSnackbarOpen(true);
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
+        input.onchange = async (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const avatarUrl = event.target.result;
+                    localStorage.setItem("userAvatar", avatarUrl);
+                    setUserData(prev => ({ ...prev, avatar: avatarUrl }));
+                    setEditedData(prev => ({ ...prev, avatar: avatarUrl }));
+                    setSnackbarMessage("Foto de perfil actualizada");
+                    setSnackbarSeverity("success");
+                    setSnackbarOpen(true);
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
     };
 
     return (
         <>
-            <Dialog
-                open={open}
-                onClose={onClose}
-                maxWidth="md"
-                fullWidth
+            <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth
                 PaperProps={{
                     sx: {
                         borderRadius: 4,
@@ -131,54 +124,34 @@ function UserProfile({ open, onClose }) {
                     }
                 }}
             >
-                <DialogTitle
-                    sx={{
-                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                        color: "white",
-                        py: 3,
-                        position: "relative",
-                    }}
-                >
+                <DialogTitle sx={{
+                    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                    color: "white", py: 3, position: "relative"
+                }}>
                     <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                        <Typography variant="h5" fontWeight="bold">
-                            Mi Perfil
-                        </Typography>
-                        <IconButton
-                            onClick={onClose}
-                            sx={{
-                                color: "white",
-                                bgcolor: alpha(theme.palette.common.white, 0.1),
-                                '&:hover': {
-                                    bgcolor: alpha(theme.palette.common.white, 0.2),
-                                }
-                            }}
-                        >
+                        <Typography variant="h5" fontWeight="bold">Mi Perfil</Typography>
+                        <IconButton onClick={onClose} sx={{
+                            color: "white", bgcolor: alpha(theme.palette.common.white, 0.1),
+                            '&:hover': { bgcolor: alpha(theme.palette.common.white, 0.2) }
+                        }}>
                             <Close />
                         </IconButton>
                     </Box>
                 </DialogTitle>
 
                 <DialogContent sx={{ p: 4 }}>
-                    {/* Header del perfil */}
                     <Box sx={{ textAlign: "center", mb: 4 }}>
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Box sx={{ position: "relative", display: "inline-block" }}>
                                 <Avatar
+                                    src={userData.avatar || undefined}
                                     sx={{
-                                        width: 120,
-                                        height: 120,
-                                        fontSize: "3rem",
+                                        width: 120, height: 120, fontSize: "3rem",
                                         fontWeight: "bold",
                                         background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                                         border: `4px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-                                        cursor: "pointer",
-                                        transition: "transform 0.3s ease",
-                                        '&:hover': {
-                                            transform: "scale(1.05)",
-                                        }
+                                        cursor: "pointer", transition: "transform 0.3s ease",
+                                        '&:hover': { transform: "scale(1.05)" }
                                     }}
                                     onClick={handleAvatarClick}
                                 >
@@ -186,16 +159,10 @@ function UserProfile({ open, onClose }) {
                                 </Avatar>
                                 <IconButton
                                     sx={{
-                                        position: "absolute",
-                                        bottom: 0,
-                                        right: 0,
+                                        position: "absolute", bottom: 0, right: 0,
                                         bgcolor: theme.palette.primary.main,
-                                        color: "white",
-                                        width: 36,
-                                        height: 36,
-                                        '&:hover': {
-                                            bgcolor: theme.palette.primary.dark,
-                                        }
+                                        color: "white", width: 36, height: 36,
+                                        '&:hover': { bgcolor: theme.palette.primary.dark }
                                     }}
                                     onClick={handleAvatarClick}
                                 >
@@ -214,10 +181,8 @@ function UserProfile({ open, onClose }) {
                             sx={{
                                 bgcolor: alpha(getRoleColor(userData.role), 0.1),
                                 color: getRoleColor(userData.role),
-                                fontWeight: "bold",
-                                fontSize: "0.9rem",
-                                px: 2,
-                                py: 1,
+                                fontWeight: "bold", fontSize: "0.9rem",
+                                px: 2, py: 1,
                                 border: `1px solid ${alpha(getRoleColor(userData.role), 0.3)}`
                             }}
                         />
@@ -230,12 +195,10 @@ function UserProfile({ open, onClose }) {
 
                     <Divider sx={{ mb: 4 }} />
 
-                    {/* Formulario de datos */}
                     <Grid container spacing={3}>
                         <Grid item xs={12} sm={6}>
                             <TextField
-                                fullWidth
-                                label="Nombre completo"
+                                fullWidth label="Nombre completo"
                                 value={isEditing ? editedData.name : userData.name}
                                 onChange={(e) => handleInputChange("name", e.target.value)}
                                 disabled={!isEditing}
@@ -246,128 +209,67 @@ function UserProfile({ open, onClose }) {
                                         </InputAdornment>
                                     ),
                                 }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 3,
-                                    }
-                                }}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                             />
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
                             <TextField
-                                fullWidth
-                                label="Email"
-                                value={isEditing ? editedData.email : userData.email}
-                                onChange={(e) => handleInputChange("email", e.target.value)}
-                                disabled={!isEditing}
-                                type="email"
+                                fullWidth label="Email"
+                                value={userData.email}
+                                disabled
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position="start">
-                                            <Email color={isEditing ? "primary" : "disabled"} />
+                                            <Email color="disabled" />
                                         </InputAdornment>
                                     ),
                                 }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 3,
-                                    }
-                                }}
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
                             />
                         </Grid>
 
                         <Grid item xs={12} sm={6}>
-                            <FormControl fullWidth disabled={!isEditing}>
-                                <InputLabel>Rol</InputLabel>
-                                <Select
-                                    value={isEditing ? editedData.role : userData.role}
-                                    label="Rol"
-                                    onChange={(e) => handleInputChange("role", e.target.value)}
-                                    sx={{
-                                        borderRadius: 3,
+                            <TextField
+                                fullWidth label="Rol"
+                                value={getRoleLabel(userData.role)}
+                                disabled
+                                sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                            />
+                        </Grid>
+
+                        {isEditing && (
+                            <Grid item xs={12} sm={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Nueva contraseña"
+                                    type="password"
+                                    value={editedData.password}
+                                    onChange={(e) => handleInputChange("password", e.target.value)}
+                                    InputProps={{
+                                        startAdornment: (
+                                            <InputAdornment position="start">
+                                                <Lock color="primary" />
+                                            </InputAdornment>
+                                        ),
                                     }}
-                                >
-                                    <MenuItem value="student">Estudiante</MenuItem>
-                                    <MenuItem value="teacher">Docente</MenuItem>
-                                </Select>
-                            </FormControl>
-                        </Grid>
-
-                        <Grid item xs={12} sm={6}>
-                            <TextField
-                                fullWidth
-                                label="Teléfono"
-                                value={isEditing ? editedData.phone : userData.phone}
-                                onChange={(e) => handleInputChange("phone", e.target.value)}
-                                disabled={!isEditing}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 3,
-                                    }
-                                }}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Institución"
-                                value={isEditing ? editedData.institution : userData.institution}
-                                onChange={(e) => handleInputChange("institution", e.target.value)}
-                                disabled={!isEditing}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position="start">
-                                            <School color={isEditing ? "primary" : "disabled"} />
-                                        </InputAdornment>
-                                    ),
-                                }}
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 3,
-                                    }
-                                }}
-                            />
-                        </Grid>
-
-                        <Grid item xs={12}>
-                            <TextField
-                                fullWidth
-                                label="Biografía"
-                                value={isEditing ? editedData.bio : userData.bio}
-                                onChange={(e) => handleInputChange("bio", e.target.value)}
-                                disabled={!isEditing}
-                                multiline
-                                rows={3}
-                                placeholder="Cuéntanos un poco sobre ti..."
-                                sx={{
-                                    '& .MuiOutlinedInput-root': {
-                                        borderRadius: 3,
-                                    }
-                                }}
-                            />
-                        </Grid>
+                                    sx={{ '& .MuiOutlinedInput-root': { borderRadius: 3 } }}
+                                />
+                            </Grid>
+                        )}
                     </Grid>
                 </DialogContent>
 
                 <DialogActions sx={{ p: 3, gap: 2 }}>
                     {!isEditing ? (
-                        <motion.div
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
+                        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                             <Button
                                 onClick={handleEdit}
                                 variant="contained"
                                 startIcon={<Edit />}
                                 sx={{
                                     background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                                    color: "white",
-                                    fontWeight: "bold",
-                                    px: 3,
-                                    py: 1,
-                                    borderRadius: 3,
+                                    color: "white", fontWeight: "bold", px: 3, py: 1, borderRadius: 3,
                                     textTransform: "none",
                                     '&:hover': {
                                         background: "linear-gradient(135deg, #764ba2 0%, #667eea 100%)",
@@ -383,29 +285,18 @@ function UserProfile({ open, onClose }) {
                                 onClick={handleCancel}
                                 variant="outlined"
                                 startIcon={<Cancel />}
-                                sx={{
-                                    borderRadius: 3,
-                                    textTransform: "none",
-                                    fontWeight: "bold",
-                                }}
+                                sx={{ borderRadius: 3, textTransform: "none", fontWeight: "bold" }}
                             >
                                 Cancelar
                             </Button>
-                            <motion.div
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                            >
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                                 <Button
                                     onClick={handleSave}
                                     variant="contained"
                                     startIcon={<Save />}
                                     sx={{
                                         background: "linear-gradient(135deg, #4caf50 0%, #45a049 100%)",
-                                        color: "white",
-                                        fontWeight: "bold",
-                                        px: 3,
-                                        py: 1,
-                                        borderRadius: 3,
+                                        color: "white", fontWeight: "bold", px: 3, py: 1, borderRadius: 3,
                                         textTransform: "none",
                                         '&:hover': {
                                             background: "linear-gradient(135deg, #45a049 0%, #4caf50 100%)",
@@ -428,10 +319,7 @@ function UserProfile({ open, onClose }) {
             >
                 <Alert
                     severity={snackbarSeverity}
-                    sx={{
-                        borderRadius: 3,
-                        backdropFilter: "blur(10px)",
-                    }}
+                    sx={{ borderRadius: 3, backdropFilter: "blur(10px)" }}
                     onClose={() => setSnackbarOpen(false)}
                 >
                     {snackbarMessage}
