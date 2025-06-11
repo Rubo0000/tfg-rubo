@@ -32,7 +32,9 @@ export default function Registro() {
     password: "",
     confirmPassword: "",
     role: "student",
+    avatar: "",
   });
+
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState("success");
@@ -54,6 +56,17 @@ export default function Registro() {
 
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
+  };
+
+  const handleAvatarUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setForm(prev => ({ ...prev, avatar: reader.result }));
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleChange = (e) => {
@@ -108,7 +121,9 @@ export default function Registro() {
           email: form.email,
           password: form.password,
           role: form.role,
+          avatar: form.avatar || undefined,
         }),
+
       });
 
       if (res.ok) {
@@ -136,7 +151,17 @@ export default function Registro() {
       <AuthHeader />
 
       <AuthFormContainer
-        avatarIcon={<PersonAddAltIcon sx={{ fontSize: 36 }} />}
+        avatarIcon={
+          form.avatar ? (
+            <img
+              src={form.avatar}
+              alt="Avatar de usuario"
+              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+            />
+          ) : (
+            <PersonAddAltIcon sx={{ fontSize: 36 }} />
+          )
+        }
         avatarBgColor="#1976d2"
         title="Crear cuenta"
         subtitle="Comienza a gestionar tus proyectos fácilmente"
@@ -283,6 +308,41 @@ export default function Registro() {
               </MenuItem>
             </Select>
           </FormControl>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography variant="subtitle1" sx={{ mb: 1 }}>
+              Foto de perfil (opcional)
+            </Typography>
+
+            <Button
+              variant="outlined"
+              component="label"
+              sx={{ borderRadius: 5, textTransform: "none", mb: 2 }}
+            >
+              Seleccionar imagen
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleAvatarUpload}
+              />
+            </Button>
+
+            {form.avatar && (
+              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
+
+                <Button
+                  size="small"
+                  variant="text"
+                  color="error"
+                  onClick={() => setForm(prev => ({ ...prev, avatar: "" }))}
+                  sx={{ textTransform: "none", fontSize: "0.85rem" }}
+                >
+                  Quitar imagen
+                </Button>
+              </Box>
+            )}
+          </Box>
+
 
           <Typography variant="body2" color="text.secondary" align="center">
             Al registrarte, aceptas nuestros{" "}
