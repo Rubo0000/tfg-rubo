@@ -1,17 +1,30 @@
-// components/TaskFilters.jsx
-import { Box, Chip, Stack, Typography, Button } from "@mui/material";
-import { use, useState } from "react";
+import {
+    Box,
+    Chip,
+    Stack,
+    Typography,
+    Button,
+    Divider,
+    ToggleButton,
+    ToggleButtonGroup,
+    useTheme,
+    Paper
+} from "@mui/material";
+import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import FilterAltOffIcon from '@mui/icons-material/FilterAltOff';
+import PersonIcon from '@mui/icons-material/Person';
+import { useState } from "react";
 
 const statuses = [
-    { label: "pendiente", color: "default" },
-    { label: "en progreso", color: "info" },
-    { label: "finalizada", color: "success" },
+    { label: "Pendiente", value: "pendiente", icon: "⏳" },
+    { label: "En Progreso", value: "en progreso", icon: "🚧" },
+    { label: "Finalizada", value: "finalizada", icon: "✅" },
 ];
 
 const priorities = [
-    { label: "alta", color: "error" },
-    { label: "media", color: "warning" },
-    { label: "baja", color: "default" },
+    { label: "Alta", value: "alta", icon: "🔥" },
+    { label: "Media", value: "media", icon: "⚠️" },
+    { label: "Baja", value: "baja", icon: "💤" },
 ];
 
 const TaskFilters = ({
@@ -21,68 +34,125 @@ const TaskFilters = ({
     setPriorityFilter,
     onlyMine,
     setOnlyMine,
-    filteredCount,
     userId
 }) => {
-    const toggleOnlyMine = () => setOnlyMine(!onlyMine);
+    const theme = useTheme();
 
+    const toggleOnlyMine = () => setOnlyMine(!onlyMine);
     const resetFilters = () => {
         setStatusFilter(null);
         setPriorityFilter(null);
         setOnlyMine(false);
     };
 
+    const hasFilters = statusFilter || priorityFilter || onlyMine;
+
     return (
-        <Box sx={{ mb: 4 }}>
-            <Typography variant="h6" sx={{ mb: 2 }}>
-                Tareas encontradas: {filteredCount}
-            </Typography>
+        <Paper
+            elevation={0}
+            sx={{
+                p: 3,
+                mb: 4,
+                borderRadius: 3,
+                border: `1px solid ${theme.palette.divider}`,
+                backgroundColor: 'background.paper'
+            }}
+        >
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h6" fontWeight={600}>
+                    <FilterAltIcon sx={{ mr: 1, verticalAlign: 'middle' }} />
+                    Filtros de Tareas
+                </Typography>
 
-            <Typography variant="subtitle2" gutterBottom>
-                Filtrar por estado:
-            </Typography>
-            <Stack direction="row" spacing={1} mb={2}>
-                {statuses.map(({ label, color }) => (
-                    <Chip
-                        key={label}
-                        label={label}
-                        clickable
-                        color={statusFilter === label ? color : "default"}
-                        variant={statusFilter === label ? "filled" : "outlined"}
-                        onClick={() => setStatusFilter(statusFilter === label ? null : label)}
-                    />
-                ))}
-            </Stack>
+                {hasFilters && (
+                    <Button
+                        startIcon={<FilterAltOffIcon />}
+                        onClick={resetFilters}
+                        size="small"
+                        color="inherit"
+                        sx={{ color: 'text.secondary' }}
+                    >
+                        Limpiar filtros
+                    </Button>
+                )}
+            </Box>
 
-            <Typography variant="subtitle2" gutterBottom>
-                Filtrar por prioridad:
-            </Typography>
-            <Stack direction="row" spacing={1} mb={2}>
-                {priorities.map(({ label, color }) => (
-                    <Chip
-                        key={label}
-                        label={label}
-                        clickable
-                        color={priorityFilter === label ? color : "default"}
-                        variant={priorityFilter === label ? "filled" : "outlined"}
-                        onClick={() => setPriorityFilter(priorityFilter === label ? null : label)}
-                    />
-                ))}
-            </Stack>
+            <Box mb={3}>
+                <Typography variant="subtitle2" fontWeight={500} gutterBottom>
+                    Estado
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
+                    {statuses.map(({ label, value, icon }) => (
+                        <Chip
+                            key={value}
+                            label={<>{icon} {label}</>}
+                            clickable
+                            color={statusFilter === value ? "primary" : "default"}
+                            variant={statusFilter === value ? "filled" : "outlined"}
+                            onClick={() => setStatusFilter(statusFilter === value ? null : value)}
+                            sx={{
+                                mb: 1,
+                                borderRadius: 2,
+                                '& .MuiChip-label': {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }
+                            }}
+                        />
+                    ))}
+                </Stack>
+            </Box>
 
-            <Stack direction="row" spacing={2}>
-                <Button
-                    variant={onlyMine ? "contained" : "outlined"}
-                    color="info"
-                    onClick={toggleOnlyMine}
+            <Box mb={3}>
+                <Typography variant="subtitle2" fontWeight={500} gutterBottom>
+                    Prioridad
+                </Typography>
+                <Stack direction="row" spacing={1} flexWrap="wrap">
+                    {priorities.map(({ label, value, icon }) => (
+                        <Chip
+                            key={value}
+                            label={<>{icon} {label}</>}
+                            clickable
+                            color={priorityFilter === value ? "primary" : "default"}
+                            variant={priorityFilter === value ? "filled" : "outlined"}
+                            onClick={() => setPriorityFilter(priorityFilter === value ? null : value)}
+                            sx={{
+                                mb: 1,
+                                borderRadius: 2,
+                                '& .MuiChip-label': {
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '6px'
+                                }
+                            }}
+                        />
+                    ))}
+                </Stack>
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
+
+            <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Typography variant="subtitle2" fontWeight={500}>
+                    Mostrar solo mis tareas
+                </Typography>
+                <ToggleButtonGroup
+                    value={onlyMine}
+                    exclusive
+                    onChange={toggleOnlyMine}
+                    size="small"
                 >
-                    Solo mis tareas
-                </Button>
-                <Button variant="outlined" color="warning" onClick={resetFilters}>
-                    Limpiar filtros
-                </Button>
-            </Stack>
-        </Box>
+                    <ToggleButton value={true} selected={onlyMine}>
+                        <PersonIcon fontSize="small" sx={{ mr: 1 }} />
+                        Sí
+                    </ToggleButton>
+                    <ToggleButton value={false} selected={!onlyMine}>
+                        No
+                    </ToggleButton>
+                </ToggleButtonGroup>
+            </Box>
+        </Paper>
     );
 };
 

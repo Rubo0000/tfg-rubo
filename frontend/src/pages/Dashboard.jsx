@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import CreateProjectModal from "../components/CreateProjectModal";
 import AppHeader from "../components/AppHeader";
 import PendingInvitations from "../components/PendingInvitations";
-import UserProfile from "../components/UserProfile"; // Importamos el componente UserProfile
+import UserProfile from "../components/UserProfile";
 
 function Dashboard() {
   const theme = useTheme();
@@ -30,7 +30,7 @@ function Dashboard() {
   const [projects, setProjects] = useState([]);
   const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false); // Estado para controlar la apertura del perfil
+  const [profileOpen, setProfileOpen] = useState(false);
   const [projectStats, setProjectStats] = useState({
     totalTasks: 0,
     completedTasks: 0,
@@ -93,22 +93,18 @@ function Dashboard() {
     }
   };
 
-  // Función para abrir el perfil de usuario
   const handleOpenProfile = () => {
     setProfileOpen(true);
   };
 
-  // Función para cerrar el perfil de usuario
   const handleCloseProfile = () => {
     setProfileOpen(false);
   };
 
   return (
     <>
-      {/* Pasamos la función para abrir el perfil al AppHeader */}
       <AppHeader onOpenProfile={handleOpenProfile} />
 
-      {/* Modal del perfil de usuario */}
       <UserProfile open={profileOpen} onClose={handleCloseProfile} />
 
       <Box sx={{ px: 4, py: 6 }}>
@@ -121,7 +117,6 @@ function Dashboard() {
             : "Todavía no tienes proyectos. ¡Empieza uno ahora!"}
         </Typography>
 
-        {/* ✅ Recarga proyectos tras aceptar invitación */}
         <PendingInvitations userId={userId} onHandled={loadUserProjects} />
 
         <Grid container spacing={3}>
@@ -134,7 +129,8 @@ function Dashboard() {
                 elevation={3}
                 sx={{
                   p: 4,
-                  borderRadius: 3,
+                  // Aumentamos el redondeo para los proyectos existentes
+                  borderRadius: theme.shape.borderRadius * 2.5,
                   textAlign: "center",
                   fontWeight: "bold",
                   height: 150,
@@ -142,10 +138,11 @@ function Dashboard() {
                   alignItems: "center",
                   justifyContent: "center",
                   cursor: "pointer",
+                  overflow: 'hidden' // Asegura que el contenido no se salga del borde redondeado
                 }}
                 onClick={() => navigate(`/projects/${project.id}`)}
               >
-                {project.name}
+                <Typography variant="h6" component="h3" noWrap>{project.name}</Typography>
               </Paper>
             </Grid>
           ))}
@@ -161,7 +158,8 @@ function Dashboard() {
               onClick={handleCreateProject}
               sx={{
                 p: 4,
-                borderRadius: 3,
+                // Aumentamos el redondeo para el botón de crear proyecto
+                borderRadius: theme.shape.borderRadius * 2.5,
                 textAlign: "center",
                 height: 150,
                 display: "flex",
@@ -169,20 +167,21 @@ function Dashboard() {
                 alignItems: "center",
                 justifyContent: "center",
                 fontWeight: "bold",
-                backgroundColor: "#f8f9fa",
-                border: "2px dashed #c0c0c0",
+                backgroundColor: theme.palette.action.hover, // Usar color del tema para hover
+                border: `2px dashed ${theme.palette.divider}`, // Usar color del tema para el borde
                 cursor: "pointer",
-                color: "#333",
+                color: theme.palette.text.secondary, // Usar color del tema para el texto
                 transition: "all 0.3s ease",
               }}
             >
               <Add sx={{ fontSize: 40, mb: 1 }} />
-              Crear nuevo proyecto
+              <Typography variant="body1">Crear nuevo proyecto</Typography>
             </Paper>
           </Grid>
         </Grid>
 
         {selectedProjectId && (
+          // Considera darle un sx prop aquí también si quieres que ProjectStats tenga bordes redondeados
           <ProjectStats {...projectStats} />
         )}
 

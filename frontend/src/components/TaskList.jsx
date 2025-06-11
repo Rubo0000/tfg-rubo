@@ -1,4 +1,4 @@
-import { Box, Typography, Grid } from "@mui/material";
+import { Box, Typography, Grid, Paper, Chip } from "@mui/material";
 import TaskCard from "./TaskCard";
 import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied";
 
@@ -35,11 +35,23 @@ const TaskList = ({
     const otras = filtered.filter(t => getUrgency(t.due_date) === "normal");
     const totalFiltradas = vencidas.length + proximas.length + otras.length;
 
-    const renderGroup = (titulo, tareas) => (
+    const renderGroup = (titulo, tareas, icon) => (
         tareas.length > 0 && (
-            <>
-                <Typography variant="h6" sx={{ mt: 4, mb: 2 }}>{titulo}</Typography>
-                <Grid container spacing={2}>
+            <Box component="section" sx={{ mt: 4 }}>
+                <Typography
+                    variant="h6"
+                    sx={{
+                        mb: 3,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1,
+                        color: 'text.primary',
+                        fontWeight: 600
+                    }}
+                >
+                    {icon} {titulo} <Chip label={`${tareas.length}`} size="small" />
+                </Typography>
+                <Grid container spacing={3}>
                     {tareas.map(task => (
                         <Grid item xs={12} sm={6} md={4} lg={3} key={task.id}>
                             <TaskCard
@@ -52,29 +64,40 @@ const TaskList = ({
                         </Grid>
                     ))}
                 </Grid>
-            </>
+            </Box>
         )
     );
 
     return (
-        <Box sx={{ mt: 4 }}>
+        <Box sx={{ mt: 2 }}>
             {totalFiltradas === 0 ? (
-                <Box sx={{ textAlign: "center", mt: 4, color: "text.secondary" }}>
-                    <SentimentDissatisfiedIcon sx={{ fontSize: 48, mb: 1 }} />
-                    <Typography variant="h6">
-                        No hay tareas que coincidan con los filtros seleccionados.
+                <Paper
+                    elevation={0}
+                    sx={{
+                        textAlign: "center",
+                        p: 4,
+                        mt: 4,
+                        backgroundColor: 'background.paper',
+                        borderRadius: 2
+                    }}
+                >
+                    <SentimentDissatisfiedIcon sx={{ fontSize: 48, mb: 2, color: 'text.disabled' }} />
+                    <Typography variant="h6" color="text.secondary">
+                        No hay tareas que coincidan con los filtros seleccionados
                     </Typography>
-                </Box>
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                        Intenta ajustar los filtros o crear una nueva tarea
+                    </Typography>
+                </Paper>
             ) : (
                 <>
-                    {renderGroup("🎉 Vencidas", vencidas)}
-                    {renderGroup("⚠️ Próximas (≤ 3 días)", proximas)}
-                    {renderGroup("📌 Otras tareas", otras)}
+                    {renderGroup("Tareas Vencidas", vencidas, "🔥")}
+                    {renderGroup("Próximas a Vencer (≤ 3 días)", proximas, "⏰")}
+                    {renderGroup("Otras Tareas", otras, "📌")}
                 </>
             )}
         </Box>
     );
-
 };
 
 export default TaskList;

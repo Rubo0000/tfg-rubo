@@ -1,3 +1,4 @@
+# routers/invitations.py
 from fastapi import APIRouter, HTTPException, Request
 from database.db import database
 from models.project_invitation import ProjectInvitation
@@ -44,9 +45,23 @@ async def invite_user(invite: InviteRequest):
 
 @router.get("/users/{user_id}/invitations")
 async def get_invitations(user_id: int):
-    query = select(ProjectInvitation).where(
-        (ProjectInvitation.invited_user_id == user_id) &
-        (ProjectInvitation.status == "pending")
+    # Modificación aquí: Incluir JOINs para obtener project_name y invited_by_name
+    query = (
+        select(
+            ProjectInvitation.id,
+            ProjectInvitation.project_id,
+            ProjectInvitation.invited_user_id,
+            ProjectInvitation.invited_by_user_id,
+            ProjectInvitation.status,
+            Project.name.label("project_name"),  # Alias para el nombre del proyecto
+            User.name.label("invited_by_name")   # Alias para el nombre del invitador
+        )
+        .join(Project, Project.id == ProjectInvitation.project_id)
+        .join(User, User.id == ProjectInvitation.invited_by_user_id)
+        .where(
+            (ProjectInvitation.invited_user_id == user_id) &
+            (ProjectInvitation.status == "pending")
+        )
     )
     return await database.fetch_all(query)
 
