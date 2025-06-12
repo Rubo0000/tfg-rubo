@@ -1,9 +1,8 @@
-// src/components/HeroSection.jsx
 import React from 'react';
 import { Box, Stack, Button, Typography, useTheme } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { ASSETS } from "../utils/constants";
 
 function HeroSection() {
@@ -19,7 +18,9 @@ function HeroSection() {
         py: { xs: 4, md: 8 },
         gap: { xs: 4, md: 8 },
         textAlign: { xs: 'center', md: 'left' },
-        px: { xs: 2, md: 0 }
+        px: { xs: 2, md: 0 },
+        position: 'relative',
+        pb: { xs: 8, md: 12 }
       }}
     >
       <Stack
@@ -108,6 +109,36 @@ function HeroSection() {
             left: 0,
           }}
         />
+      </Box>
+
+      <Box
+        sx={{
+          position: 'absolute',
+          bottom: { xs: theme.spacing(4), md: theme.spacing(6) },
+          left: '50%',
+          transform: 'translateX(-50%)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: 1,
+          color: theme.palette.text.secondary,
+        }}
+      >
+        <motion.div
+          initial={{ y: 0 }}
+          animate={{ y: [0, -10, 0] }}
+          transition={{
+            repeat: Infinity,
+            duration: 1.5,
+            ease: "easeInOut",
+            delay: 2
+          }}
+        >
+          <ChevronDown size={32} color={theme.palette.primary.main} />
+        </motion.div>
+        <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
+          Explora más
+        </Typography>
       </Box>
     </Box>
   );
