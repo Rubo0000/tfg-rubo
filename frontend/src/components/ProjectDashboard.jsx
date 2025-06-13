@@ -17,7 +17,6 @@ import TaskFilters from "../components/TaskFilters";
 import TaskList from "../components/TaskList";
 import ProjectMembers from "../components/ProjectMembers";
 import AppHeader from "../components/AppHeader";
-import PendingInvitations from "../components/PendingInvitations";
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);
@@ -25,8 +24,8 @@ function ProjectDashboard() {
     const [taskModalOpen, setTaskModalOpen] = useState(false);
     const [tasks, setTasks] = useState([]);
     const [selectedTask, setSelectedTask] = useState(null);
-    const [statusFilter, setStatusFilter] = useState(null);
-    const [priorityFilter, setPriorityFilter] = useState(null);
+    const [statusFilter, setStatusFilter] = useState([]);
+    const [priorityFilter, setPriorityFilter] = useState([]);
     const [onlyMine, setOnlyMine] = useState(false);
     const [users, setUsers] = useState([]);
     const [projectUsers, setProjectUsers] = useState([]);
@@ -126,9 +125,6 @@ function ProjectDashboard() {
     return (
         <>
             <AppHeader onOpenProfile={handleOpenProfile} />
-            <Box sx={{ mb: 4 }}>
-                <PendingInvitations userId={userId} onHandled={loadProjectUsers} />
-            </Box>
             <Box sx={{ px: 4, py: 6 }}>
                 <ProjectDetailsHeader name={project.name} description={project.description} />
 

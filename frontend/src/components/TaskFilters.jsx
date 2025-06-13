@@ -82,25 +82,35 @@ const TaskFilters = ({
                     Estado
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap">
-                    {statuses.map(({ label, value, icon }) => (
-                        <Chip
-                            key={value}
-                            label={<>{icon} {label}</>}
-                            clickable
-                            color={statusFilter === value ? "primary" : "default"}
-                            variant={statusFilter === value ? "filled" : "outlined"}
-                            onClick={() => setStatusFilter(statusFilter === value ? null : value)}
-                            sx={{
-                                mb: 1,
-                                borderRadius: 2,
-                                '& .MuiChip-label': {
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px'
-                                }
-                            }}
-                        />
-                    ))}
+                    {statuses.map(({ label, value, icon }) => {
+                        const isSelected = Array.isArray(statusFilter) && statusFilter.includes(value);
+                        return (
+                            <Chip
+                                key={value}
+                                label={<>{icon} {label}</>}
+                                clickable
+                                color={isSelected ? "primary" : "default"}
+                                variant={isSelected ? "filled" : "outlined"}
+                                onClick={() => {
+                                    if (isSelected) {
+                                        setStatusFilter(statusFilter.filter(s => s !== value));
+                                    } else {
+                                        setStatusFilter([...statusFilter, value]);
+                                    }
+                                }}
+                                sx={{
+                                    mb: 1,
+                                    borderRadius: 2,
+                                    '& .MuiChip-label': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }
+                                }}
+                            />
+                        );
+                    })}
+
                 </Stack>
             </Box>
 
@@ -109,25 +119,35 @@ const TaskFilters = ({
                     Prioridad
                 </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap">
-                    {priorities.map(({ label, value, icon }) => (
-                        <Chip
-                            key={value}
-                            label={<>{icon} {label}</>}
-                            clickable
-                            color={priorityFilter === value ? "primary" : "default"}
-                            variant={priorityFilter === value ? "filled" : "outlined"}
-                            onClick={() => setPriorityFilter(priorityFilter === value ? null : value)}
-                            sx={{
-                                mb: 1,
-                                borderRadius: 2,
-                                '& .MuiChip-label': {
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    gap: '6px'
-                                }
-                            }}
-                        />
-                    ))}
+                    {priorities.map(({ label, value, icon }) => {
+                        const isSelected = priorityFilter.includes(value);
+                        return (
+                            <Chip
+                                key={value}
+                                label={<>{icon} {label}</>}
+                                clickable
+                                color={isSelected ? "primary" : "default"}
+                                variant={isSelected ? "filled" : "outlined"}
+                                onClick={() => {
+                                    if (isSelected) {
+                                        setPriorityFilter(priorityFilter.filter(p => p !== value));
+                                    } else {
+                                        setPriorityFilter([...priorityFilter, value]);
+                                    }
+                                }}
+                                sx={{
+                                    mb: 1,
+                                    borderRadius: 2,
+                                    '& .MuiChip-label': {
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '6px'
+                                    }
+                                }}
+                            />
+                        );
+                    })}
+
                 </Stack>
             </Box>
 

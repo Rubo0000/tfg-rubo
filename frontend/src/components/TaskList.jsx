@@ -24,8 +24,8 @@ const TaskList = ({
     projectId,
 }) => {
     const filtered = tasks.filter(task => {
-        const matchStatus = !statusFilter || task.status === statusFilter;
-        const matchPriority = !priorityFilter || task.priority === priorityFilter;
+        const matchStatus = statusFilter.length === 0 || statusFilter.includes(task.status);
+        const matchPriority = priorityFilter.length === 0 || priorityFilter.includes(task.priority);
         const matchMine = !onlyMine || task.assigned_to === userId;
         return matchStatus && matchPriority && matchMine;
     });
