@@ -1,8 +1,7 @@
-// src/components/AppHeader.jsx
 import React from 'react';
 import { AppBar, Toolbar, Box, Stack, Button, Typography, useTheme, Link as MuiLink } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { ASSETS, NAV_LINKS } from "../utils/constants";
+import { ASSETS } from "../utils/constants";
 
 function LandPageHeader() {
     const theme = useTheme();
@@ -32,18 +31,7 @@ function LandPageHeader() {
                 </RouterLink>
 
                 <Stack direction="row" spacing={{ xs: 1, sm: 2 }}>
-                    {NAV_LINKS.map((link) => (
-                        <MuiLink
-                            key={link.name}
-                            component={RouterLink}
-                            to={link.path}
-                            color="text.secondary"
-                            underline="hover"
-                            sx={{ display: { xs: 'none', sm: 'block' } }}
-                        >
-                            {link.name}
-                        </MuiLink>
-                    ))}
+
                     <Button
                         component={RouterLink}
                         to="/login"

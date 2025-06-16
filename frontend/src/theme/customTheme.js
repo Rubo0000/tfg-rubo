@@ -99,8 +99,11 @@ const customTheme = createTheme({
         },
         outlinedPrimary: {
           borderWidth: '2px !important',
+          transition: 'transform 0.2s ease-out, box-shadow 0.2s ease-out',
           '&:hover': {
             backgroundColor: 'rgba(74, 91, 255, 0.05)',
+            transform: 'translateY(-2px)',
+            boxShadow: '0px 12px 20px rgba(74, 91, 255, 0.4)',
           },
         },
       },
