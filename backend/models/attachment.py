@@ -14,13 +14,3 @@ class Attachment(Base):
     uploaded_at = Column(DateTime, default=datetime.utcnow)
 
     task = relationship("Task")
-class AttachmentOut(Base):
-    __tablename__ = "attachmentsout"
-
-    id = Column(Integer, primary_key=True, index=True)
-    filename = Column(String, nullable=False)
-    filepath = Column(String, nullable=False)
-    task_id = Column(Integer, ForeignKey("tasks.id"), nullable=False)
-    uploaded_at = Column(DateTime, default=datetime.utcnow)
-
-    task = relationship("Task")

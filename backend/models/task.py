@@ -4,6 +4,7 @@ from sqlalchemy import Enum as SQLAlchemyEnum
 from enums import PriorityEnum, StatusEnum
 from sqlalchemy.orm import relationship
 from models.comment import Comment
+from models.attachment import Attachment
 class Task(Base):
     __tablename__ = "tasks"
 
@@ -16,3 +17,4 @@ class Task(Base):
     project_id = Column(Integer, ForeignKey("projects.id"), nullable=False)
     assigned_to = Column(Integer, ForeignKey("users.id"), nullable=True)
     comments = relationship("Comment", back_populates="task", cascade="all, delete-orphan")
+    attachments = relationship("Attachment", back_populates="task", cascade="all, delete-orphan")
