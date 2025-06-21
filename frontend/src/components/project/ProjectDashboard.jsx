@@ -12,7 +12,7 @@ import { useProjectStats } from "../../hooks/useProjectStats";
 import ProjectDetailsHeader from "../project/ProjectDetailsHeader";
 import ProjectStats from "./ProjectStats";
 import ProjectOverview from "../project/ProjectOverview";
-import CreateTaskModal from "../task/CreateTaskModal";
+import CreateTaskModal from "../task/TaskCreateModal";
 import TaskFilters from "../task/TaskFilters";
 import TaskList from "../task/TaskList";
 import ProjectMembers from "./ProjectMembers";
