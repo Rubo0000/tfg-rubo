@@ -17,7 +17,7 @@ import InsertDriveFileIcon from '@mui/icons-material/InsertDriveFile';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import DownloadIcon from '@mui/icons-material/Download';
 import DeleteIcon from "@mui/icons-material/Delete";
-import { fetchAttachmentsByTaskId, uploadAttachmentToTask } from '../services/api';
+import { fetchAttachmentsByTaskId, uploadAttachmentToTask } from '../../services/api';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 

@@ -7,16 +7,16 @@ import {
     fetchProjectById, fetchTasksByProject, createTask, updateTask,
     fetchUsersByProject, deleteTask, removeUserFromProject, addUserToProject,
     fetchUsers, inviteUserToProject
-} from "../services/api";
-import { useProjectStats } from "../hooks/useProjectStats";
-import ProjectDetailsHeader from "../components/ProjectDetailsHeader";
-import ProjectStats from "../components/ProjectStats";
-import ProjectOverview from "../components/ProjectOverview";
-import CreateTaskModal from "../components/CreateTaskModal";
-import TaskFilters from "../components/TaskFilters";
-import TaskList from "../components/TaskList";
-import ProjectMembers from "../components/ProjectMembers";
-import AppHeader from "../components/AppHeader";
+} from "../../services/api";
+import { useProjectStats } from "../../hooks/useProjectStats";
+import ProjectDetailsHeader from "../project/ProjectDetailsHeader";
+import ProjectStats from "./ProjectStats";
+import ProjectOverview from "../project/ProjectOverview";
+import CreateTaskModal from "../task/CreateTaskModal";
+import TaskFilters from "../task/TaskFilters";
+import TaskList from "../task/TaskList";
+import ProjectMembers from "./ProjectMembers";
+import AppHeader from "../layout/AppHeader";
 function ProjectDashboard() {
     const { projectId } = useParams();
     const [project, setProject] = useState(null);

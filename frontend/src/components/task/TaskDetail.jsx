@@ -16,16 +16,16 @@ import { useState, useEffect } from "react";
 import {
     fetchTaskById,
     fetchUsers
-} from "../services/api";
+} from "../../services/api";
 import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
 import CommentIcon from "@mui/icons-material/Comment";
 import HistoryIcon from "@mui/icons-material/History";
 import InfoIcon from "@mui/icons-material/Info";
 import { format } from "date-fns";
-import AttachmentsSection from "./AttachmentsSection";
+import AttachmentsSection from "./TaskAttachments";
 import TaskComments from "./TaskComments";
 import TaskInfo from "./TaskInfo";
-import AppHeader from "./AppHeader";
+import AppHeader from "../layout/AppHeader";
 import { deepPurple, grey, green, orange, red } from "@mui/material/colors"; // Importar colores
 
 const TaskDetail = () => {

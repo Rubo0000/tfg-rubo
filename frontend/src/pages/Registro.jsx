@@ -21,9 +21,9 @@ import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import AuthHeader from "../components/AuthHeader";
-import AuthFormContainer from "../components/AuthFormContainer";
-import AuthSnackbar from "../components/AuthSnackbar"; // Importa el nuevo componente
+import AuthHeader from "../components/auth/AuthHeader";
+import AuthFormContainer from "../components/auth/AuthFormContainer";
+import AuthSnackbar from "../components/auth/AuthSnackbar";
 
 export default function Registro() {
   const [form, setForm] = useState({

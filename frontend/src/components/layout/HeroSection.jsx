@@ -3,7 +3,7 @@ import { Box, Stack, Button, Typography, useTheme } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from 'lucide-react';
-import { ASSETS } from "../utils/constants";
+import { ASSETS } from "../../utils/constants";
 
 function HeroSection() {
   const theme = useTheme();

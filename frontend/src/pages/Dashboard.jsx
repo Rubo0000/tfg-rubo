@@ -10,17 +10,17 @@ import {
 import { Add } from "@mui/icons-material";
 import { motion } from "framer-motion";
 import { useEffect, useState, useCallback } from "react";
-import ProjectStats from "../components/ProjectStats";
+import ProjectStats from "../components/project/ProjectStats";
 import {
   fetchTasksByProject,
   fetchProjectsByUser,
   createProject,
 } from "../services/api";
 import { useNavigate } from "react-router-dom";
-import CreateProjectModal from "../components/CreateProjectModal";
-import AppHeader from "../components/AppHeader";
-import PendingInvitations from "../components/PendingInvitations";
-import UserProfile from "../components/UserProfile";
+import CreateProjectModal from "../components/project/ProjectCreateModal";
+import AppHeader from "../components/layout/AppHeader";
+import PendingInvitations from "../components/project/ProjectPendingInvitations";
+import UserProfile from "../components/user/UserProfile";
 
 function Dashboard() {
   const theme = useTheme();

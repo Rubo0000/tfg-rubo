@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Container, Stack, Typography, Grid, Link as MuiLink, useTheme } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { ASSETS, FOOTER_LINKS } from "../utils/constants";
+import { ASSETS, FOOTER_LINKS } from "../../utils/constants";
 
 function AppFooter() {
   const theme = useTheme();

@@ -3,8 +3,8 @@ import Home from "./pages/Home";
 import Registro from "./pages/Registro";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
-import ProjectDashboard from "./components/ProjectDashboard";
-import TaskDetail from "./components/TaskDetail";
+import ProjectDashboard from "./components/project/ProjectDashboard";
+import TaskDetail from "./components/task/TaskDetail";
 function App() {
   const user = localStorage.getItem("user");
 

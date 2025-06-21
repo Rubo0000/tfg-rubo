@@ -16,7 +16,7 @@ import {
     fetchUserInvitations,
     acceptInvitation,
     rejectInvitation,
-} from "../services/api";
+} from "../../services/api";
 
 const PendingInvitations = ({ userId, onHandled }) => {
     const theme = useTheme(); // Usar el hook useTheme

@@ -21,7 +21,7 @@ import {
     fetchCommentsByTaskId,
     addCommentToTask,
     deleteComment,
-} from "../services/api";
+} from "../../services/api";
 import { format, isValid } from "date-fns";
 import { es } from 'date-fns/locale'; // Importar el locale español
 

@@ -3,10 +3,10 @@ import React from 'react';
 import { Box, Container, CssBaseline, Grid, Typography, ThemeProvider } from "@mui/material";
 import { BrowserRouter as Router } from "react-router-dom";
 import customTheme from "../theme/customTheme";
-import LandPageHeader from "../components/LandPageHeader";
-import HeroSection from "../components/HeroSection";
-import FeatureCard from "../components/FeatureCard";
-import AppFooter from "../components/AppFooter";
+import LandPageHeader from "../components/layout/LandPageHeader";
+import HeroSection from "../components/layout/HeroSection";
+import FeatureCard from "../components/layout/FeatureCard";
+import AppFooter from "../components/layout/AppFooter";
 import { FEATURES } from "../utils/constants";
 
 function Home() {

@@ -10,7 +10,7 @@ import {
 } from "@mui/icons-material";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { updateUser } from "../services/api";
+import { updateUser } from "../../services/api";
 
 function UserProfile({ open, onClose }) {
     const theme = useTheme();

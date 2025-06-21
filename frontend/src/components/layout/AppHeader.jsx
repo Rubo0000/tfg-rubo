@@ -26,7 +26,7 @@ import {
     AccountCircle
 } from "@mui/icons-material";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { logoutUser } from "../services/api";
+import { logoutUser } from "../../services/api";
 import { useState } from "react";
 import { motion } from "framer-motion";
 

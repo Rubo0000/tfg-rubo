@@ -1,7 +1,7 @@
 import React from 'react';
 import { AppBar, Toolbar, Box, Stack, Button, Typography, useTheme, Link as MuiLink } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
-import { ASSETS } from "../utils/constants";
+import { ASSETS } from "../../utils/constants";
 
 function LandPageHeader() {
     const theme = useTheme();
