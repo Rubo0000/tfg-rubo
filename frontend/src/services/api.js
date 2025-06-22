@@ -128,6 +128,7 @@ export const inviteUserToProject = async (projectId, invitedName, invitedById) =
         invited_name: invitedName,
         invited_by: invitedById
     });
+    console.log("Invitación enviada:", response.data);
     return response.data;
 };
 

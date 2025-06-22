@@ -19,7 +19,7 @@ import {
 import { useNavigate } from "react-router-dom";
 import CreateProjectModal from "../components/project/ProjectCreateModal";
 import AppHeader from "../components/layout/AppHeader";
-import PendingInvitations from "../components/project/ProjectPendingInvitations";
+import PendingInvitations from "../components/project/PendingInvitations";
 import UserProfile from "../components/user/UserProfile";
 
 function Dashboard() {

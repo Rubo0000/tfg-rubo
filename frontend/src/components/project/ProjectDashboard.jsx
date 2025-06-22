@@ -70,6 +70,7 @@ function ProjectDashboard() {
     };
     const handleInviteUser = async (username) => {
         try {
+            console.log("Invitando usuario:", username, "a proyecto:", projectId, "por usuario:", userId);
             await inviteUserToProject(projectId, username, userId);
             alert(`Invitación enviada a ${username}`);
         } catch (err) {
