@@ -175,15 +175,30 @@ function UserProfile({ open, onClose }) {
                             {userData.name}
                         </Typography>
 
+                        // En UserProfile.jsx, modificar la parte donde se muestra el rol:
                         <Chip
                             icon={<Badge />}
-                            label={getRoleLabel(userData.role)}
+                            label={userData.role === "teacher" ? "Docente" : "Estudiante"}
                             sx={{
-                                bgcolor: alpha(getRoleColor(userData.role), 0.1),
-                                color: getRoleColor(userData.role),
-                                fontWeight: "bold", fontSize: "0.9rem",
-                                px: 2, py: 1,
-                                border: `1px solid ${alpha(getRoleColor(userData.role), 0.3)}`
+                                bgcolor: alpha(
+                                    userData.role === "teacher"
+                                        ? theme.palette.success.main
+                                        : theme.palette.primary.main,
+                                    0.1
+                                ),
+                                color: userData.role === "teacher"
+                                    ? theme.palette.success.main
+                                    : theme.palette.primary.main,
+                                fontWeight: "bold",
+                                fontSize: "0.9rem",
+                                px: 2,
+                                py: 1,
+                                border: `1px solid ${alpha(
+                                    userData.role === "teacher"
+                                        ? theme.palette.success.main
+                                        : theme.palette.primary.main,
+                                    0.3
+                                )}`
                             }}
                         />
 

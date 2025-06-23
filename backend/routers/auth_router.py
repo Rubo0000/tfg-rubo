@@ -24,6 +24,9 @@ async def login(data: LoginInput):
     return {
             "access_token": token,
             "user_id":user.id,
+            "role":user.role,
+            "name":user.name,
+            "email":user.email
         }
 
 @router.post("/logout")
