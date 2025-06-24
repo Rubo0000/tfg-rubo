@@ -18,7 +18,7 @@ import { CheckCircle, Schedule, Group } from "@mui/icons-material";
 function ProjectSupervision({ projects }) {
     const theme = useTheme();
     const navigate = useNavigate();
-
+    console.log(projects);
     const getStatusColor = (status) => {
         switch (status) {
             case 'active': return 'success';
