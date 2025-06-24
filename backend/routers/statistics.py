@@ -3,9 +3,9 @@
 from fastapi import APIRouter, HTTPException
 from database.db import database
 from models.project import Project
-from models.task import Task # Asegúrate de que tu modelo Task esté correctamente definido e importable
-from models.user import User # Asegúrate de que tu modelo User esté correctamente definido e importable
-from models.project_user import ProjectUser # Importar para contar proyectos por usuario
+from models.task import Task 
+from models.user import User 
+from models.project_user import ProjectUser
 from sqlalchemy import select, func
 
 router = APIRouter()
@@ -13,67 +13,60 @@ router = APIRouter()
 @router.get("/global")
 async def get_global_statistics():
     try:
-        # Obtener todos los proyectos
-        projects_query = select(Project)
-        projects = await database.fetch_all(projects_query)
-
-        # Obtener todas las tareas
-        tasks_query = select(Task)
-        tasks = await database.fetch_all(tasks_query)
-
-        # Obtener todos los estudiantes (usuarios con rol "student")
-        students_query = select(User).where(User.role == "student")
-        students = await database.fetch_all(students_query)
+        # Obtener todos los proyectos y tareas
+        projects = await database.fetch_all(select(Project))
+        tasks = await database.fetch_all(select(Task))
+        students = await database.fetch_all(select(User).where(User.role == "student"))
 
         # Calcular estadísticas generales
         total_projects = len(projects)
         total_tasks = len(tasks)
         completed_tasks = len([t for t in tasks if t["status"] == "finalizada"])
         pending_tasks = total_tasks - completed_tasks
-        total_students = len(students)
 
-        # Calcular progreso y conteo de proyectos/tareas por estudiante
-        student_progress_data = {}
+        # Calcular progreso por estudiante (versión optimizada)
+        student_progress = {}
         for student in students:
-            # Contar proyectos del estudiante
-            student_projects_query = select(Project).join(ProjectUser).where(ProjectUser.user_id == student["id"])
-            student_projects = await database.fetch_all(student_projects_query)
+            # Consulta optimizada para proyectos del estudiante
+            projects_query = """
+            SELECT COUNT(*) as count 
+            FROM project_users 
+            WHERE user_id = :user_id
+            """
+            projects_count = await database.fetch_one(projects_query, {"user_id": student["id"]})
 
-            # Contar tareas asignadas al estudiante
-            student_tasks_assigned_query = select(Task).where(Task.assigned_to == student["id"])
-            student_tasks_assigned = await database.fetch_all(student_tasks_assigned_query)
-
-            total_student_tasks = len(student_tasks_assigned)
-            completed_student_tasks = len([t for t in student_tasks_assigned if t["status"] == "finalizada"])
+            # Consulta optimizada para tareas del estudiante
+            tasks_query = """
+            SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN status = 'finalizada' THEN 1 ELSE 0 END) as completed
+            FROM tasks 
+            WHERE assigned_to = :user_id
+            """
+            tasks_data = await database.fetch_one(tasks_query, {"user_id": student["id"]})
 
             progress = 0
-            if total_student_tasks > 0:
-                progress = round((completed_student_tasks / total_student_tasks) * 100)
+            if tasks_data["total"] and tasks_data["total"] > 0:
+                progress = round((tasks_data["completed"] / tasks_data["total"]) * 100)
 
-            student_progress_data[student["id"]] = {
-                "name": student["name"],
-                "projects": len(student_projects),
-                "tasks": total_student_tasks,
-                "progress": progress
+            student_progress[student["id"]] = {
+                "progress": progress,
+                "projects": projects_count["count"] or 0,
+                "completed_tasks": tasks_data["completed"] or 0,
+                "pending_tasks": (tasks_data["total"] or 0) - (tasks_data["completed"] or 0)
             }
-
-        # Calcular el progreso promedio general de los estudiantes
-        avg_progress = 0
-        if student_progress_data:
-            total_progress_sum = sum([s["progress"] for s in student_progress_data.values()])
-            avg_progress = round(total_progress_sum / len(student_progress_data))
 
         return {
             "total_projects": total_projects,
             "total_tasks": total_tasks,
             "completed_tasks": completed_tasks,
             "pending_tasks": pending_tasks,
-            "total_students": total_students,
-            "average_progress": avg_progress,
-            "student_progress": student_progress_data
+            "student_progress": student_progress
         }
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error al obtener estadísticas globales: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error al obtener estadísticas: {str(e)}")
+
 @router.get("/users/{user_id}/progress")
 async def get_student_progress(user_id: int):
     try:

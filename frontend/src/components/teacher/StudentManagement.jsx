@@ -14,8 +14,10 @@ import {
     useTheme,
     Button,
     Stack,
-    CircularProgress
+    CircularProgress,
+    Alert
 } from "@mui/material";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { CheckCircle, Warning, Error } from "@mui/icons-material";
 
@@ -23,6 +25,14 @@ function StudentManagement({ students, stats }) {
     const theme = useTheme();
     const navigate = useNavigate();
 
+
+    useEffect(() => {
+        console.log("Datos recibidos en StudentManagement:", {
+            students,
+            stats,
+            studentProgress: stats?.student_progress
+        });
+    }, [students, stats]);
     const getProgressColor = (progress) => {
         if (progress >= 80) return 'success';
         if (progress >= 50) return 'primary';
@@ -34,6 +44,29 @@ function StudentManagement({ students, stats }) {
         if (progress >= 50) return <Warning fontSize="small" color="warning" />;
         return <Error fontSize="small" color="error" />;
     };
+
+    // Verificar si los datos están cargando
+    if (!stats || !students) {
+        return (
+            <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
+                <CircularProgress />
+            </Box>
+        );
+    }
+
+    // Verificar si hay datos de progreso
+    if (!stats.student_progress || Object.keys(stats.student_progress).length === 0) {
+        return (
+            <Box>
+                <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
+                    Lista de todos los estudiantes y su progreso
+                </Typography>
+                <Alert severity="warning">
+                    No se encontraron datos de progreso para los estudiantes.
+                </Alert>
+            </Box>
+        );
+    }
 
     return (
         <Box>
@@ -61,7 +94,12 @@ function StudentManagement({ students, stats }) {
                         </TableHead>
                         <TableBody>
                             {students.map((student) => {
-                                const progress = stats?.student_progress[student.id]?.progress || 0;
+                                const studentProgress = stats.student_progress[student.id] || {};
+                                const progress = studentProgress.progress || 0;
+                                const projectsCount = studentProgress.projects || 0;
+                                const completedTasks = studentProgress.completed_tasks || 0;
+                                const pendingTasks = studentProgress.pending_tasks || 0;
+
                                 return (
                                     <TableRow
                                         key={student.id}
@@ -89,7 +127,7 @@ function StudentManagement({ students, stats }) {
                                         </TableCell>
                                         <TableCell align="center">
                                             <Chip
-                                                label={stats?.student_progress[student.id]?.projects || 0}
+                                                label={projectsCount}
                                                 color="primary"
                                                 variant="outlined"
                                                 size="small"
@@ -102,13 +140,13 @@ function StudentManagement({ students, stats }) {
                                         <TableCell align="center">
                                             <Stack direction="row" spacing={1} justifyContent="center">
                                                 <Chip
-                                                    label={`${stats?.student_progress[student.id]?.completed_tasks || 0}✓`}
+                                                    label={`${completedTasks}✓`}
                                                     color="success"
                                                     size="small"
                                                     sx={{ borderRadius: 1 }}
                                                 />
                                                 <Chip
-                                                    label={`${stats?.student_progress[student.id]?.pending_tasks || 0}⌛`}
+                                                    label={`${pendingTasks}⌛`}
                                                     color="warning"
                                                     size="small"
                                                     sx={{ borderRadius: 1 }}
