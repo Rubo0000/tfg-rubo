@@ -1,3 +1,5 @@
+# user.py
+
 from fastapi import APIRouter, HTTPException, Depends
 from database.db import database
 from models.user import User, UserIn, UserUpdate
@@ -15,7 +17,7 @@ async def create_user(user: UserIn):
         email=user.email,
         password=hashed_pwd,
         role=user.role,
-        avatar=user.avatar or "default_avatar.png"  # 👈 si no se pasa avatar, usa por defecto
+        avatar=user.avatar or "default_avatar.png"
     )
 
     try:
@@ -30,12 +32,31 @@ async def get_users():
     query = select(User)
     return await database.fetch_all(query)
 
+@router.get("/users/me")
+async def get_current_user(user_id: int = Depends(get_current_user_id)):
+    query = select(User).where(User.id == user_id)
+    user = await database.fetch_one(query)
+    if not user:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    return {
+        "id": user["id"],
+        "name": user["name"],
+        "email": user["email"],
+        "role": user["role"],
+        "avatar": user["avatar"],
+        "joinDate": user["join_date"],
+    }
+
+@router.get("/users/students")
+async def get_students():
+    query = select(User).where(User.role == "student")
+    return await database.fetch_all(query)
+# ---------------------------------------------------------------------
 
 @router.get("/users/{user_id}")
 async def get_user(user_id: int):
     query = select(User).where(User.id == user_id)
     return await database.fetch_one(query)
-
 
 @router.put("/users/{user_id}")
 async def update_user(user_id: int, user: UserUpdate):
@@ -54,18 +75,3 @@ async def update_user(user_id: int, user: UserUpdate):
         return {"message": "Usuario actualizado con éxito"}
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-@router.get("/users/me")
-async def get_current_user(user_id: int = Depends(get_current_user_id)):
-    query = select(User).where(User.id == user_id)
-    user = await database.fetch_one(query)
-    if not user:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    # Excluir contraseña
-    return {
-        "id": user["id"],
-        "name": user["name"],
-        "email": user["email"],
-        "role": user["role"],
-        "avatar": user["avatar"],
-        "joinDate": user["join_date"],
-    }

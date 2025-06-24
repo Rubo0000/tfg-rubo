@@ -125,6 +125,16 @@ const customTheme = createTheme({
       },
     },
   },
+  palette: {
+    teacherPrimary: {
+      main: '#3f51b5',
+      contrastText: '#fff',
+    },
+    teacherSecondary: {
+      main: '#f50057',
+      contrastText: '#fff',
+    },
+  },
 });
 
 export default customTheme;

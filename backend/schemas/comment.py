@@ -11,6 +11,6 @@ class CommentOut(BaseModel):
     created_at: datetime
     user_id: int
     author_name: str
-
+    author_role: str
     class Config:
         orm_mode = True

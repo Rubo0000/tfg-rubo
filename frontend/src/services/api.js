@@ -152,3 +152,31 @@ export const updateUser = async (userId, userData) => {
     console.log("User updated:", response.data);
     return response.data;
 };
+
+export const fetchAllProjects = async () => {
+    const response = await axios.get(`${API_BASE_URL}/projects/all`);
+    return response.data;
+};
+
+export const fetchStudents = async () => {
+    const response = await axios.get(`${API_BASE_URL}/users/students`);
+    return response.data;
+};
+
+export const fetchStudentProgress = async (studentId) => {
+    const response = await axios.get(`${API_BASE_URL}/users/${studentId}/progress`);
+    return response.data;
+};
+
+export const fetchGlobalStatistics = async () => {
+    const response = await axios.get(`${API_BASE_URL}/global`);
+    return response.data;
+};
+
+export const addTeacherComment = async (taskId, commentData) => {
+    const response = await axios.post(
+        `${API_BASE_URL}/tasks/${taskId}/teacher-comments`,
+        commentData
+    );
+    return response.data;
+};

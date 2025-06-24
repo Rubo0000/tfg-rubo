@@ -14,6 +14,7 @@ import {
     Fade,
     InputAdornment
 } from "@mui/material";
+import TeacherFeedback from "./TeacherFeedback";
 import SendIcon from "@mui/icons-material/Send";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
@@ -175,6 +176,7 @@ const TaskComments = ({ taskId, userMap }) => {
                     ),
                 }}
             />
+            <TeacherFeedback comments={comments} />
         </Box>
     );
 };

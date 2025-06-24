@@ -19,7 +19,8 @@ def get_comments(task_id: int, db: Session = Depends(get_db)):
             content=comment.content,
             created_at=comment.created_at,
             user_id=comment.author_id,
-            author_name=author.name if author else "Desconocido"
+            author_name=author.name if author else "Desconocido",
+            author_role=author.role if author else "Desconocido"
         ))
     return result
 
@@ -39,7 +40,8 @@ def add_comment(task_id: int, comment: CommentCreate, db: Session = Depends(get_
         content=new_comment.content,
         created_at=new_comment.created_at,
         user_id=new_comment.author_id,
-        author_name=author.name if author else "Desconocido"
+        author_name=author.name if author else "Desconocido",
+        author_role=author.role if author else "Desconocido"
     )
 
 @router.delete("/comments/{comment_id}", response_model=CommentOut)
