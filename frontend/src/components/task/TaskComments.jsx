@@ -84,69 +84,71 @@ const TaskComments = ({ taskId, userMap }) => {
                             Sé el primero en dejar un comentario.
                         </Typography>
                     ) : (
-                        comments.map((comment) => (
-                            <Fade in={true} key={comment.id}>
-                                <ListItem
-                                    alignItems="flex-start"
-                                    sx={{
-                                        py: 1.5,
-                                        px: 2,
-                                        mb: 1,
-                                        borderRadius: 1.5,
-                                        bgcolor: comment.user_id === userId ? 'primary.light' : 'grey.100',
-                                        ml: comment.user_id === userId ? 'auto' : 0, // Alinea tus comentarios a la derecha
-                                        mr: comment.user_id === userId ? 0 : 'auto', // Alinea tus comentarios a la izquierda
-                                        maxWidth: '95%',
-                                        boxShadow: 1,
-                                        '&:hover': {
-                                            boxShadow: 3,
-                                        }
-                                    }}
-                                >
-                                    <ListItemAvatar>
-                                        <Avatar sx={{ bgcolor: comment.user_id === userId ? 'primary.main' : 'secondary.main' }}>
-                                            {userMap[comment.user_id]?.charAt(0) || 'U'}
-                                        </Avatar>
-                                    </ListItemAvatar>
-                                    <ListItemText
-                                        primary={
-                                            <Typography
-                                                component="span"
-                                                variant="subtitle2"
-                                                color="text.primary"
-                                                sx={{ fontWeight: 600 }}
-                                            >
-                                                {userMap[comment.user_id] || "Usuario Desconocido"}
+                        comments
+                            .filter(comment => comment.author_role == "student")
+                            .map((comment) => (
+                                <Fade in={true} key={comment.id}>
+                                    <ListItem
+                                        alignItems="flex-start"
+                                        sx={{
+                                            py: 1.5,
+                                            px: 2,
+                                            mb: 1,
+                                            borderRadius: 1.5,
+                                            bgcolor: comment.user_id === userId ? 'primary.light' : 'grey.100',
+                                            ml: comment.user_id === userId ? 'auto' : 0, // Alinea tus comentarios a la derecha
+                                            mr: comment.user_id === userId ? 0 : 'auto', // Alinea tus comentarios a la izquierda
+                                            maxWidth: '95%',
+                                            boxShadow: 1,
+                                            '&:hover': {
+                                                boxShadow: 3,
+                                            }
+                                        }}
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar sx={{ bgcolor: comment.user_id === userId ? 'primary.main' : 'secondary.main' }}>
+                                                {userMap[comment.user_id]?.charAt(0) || 'U'}
+                                            </Avatar>
+                                        </ListItemAvatar>
+                                        <ListItemText
+                                            primary={
                                                 <Typography
                                                     component="span"
-                                                    variant="caption"
-                                                    color="text.secondary"
-                                                    sx={{ ml: 1 }}
+                                                    variant="subtitle2"
+                                                    color="text.primary"
+                                                    sx={{ fontWeight: 600 }}
                                                 >
-                                                    {isValid(new Date(comment.created_at)) ? format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm', { locale: es }) : 'Fecha inválida'}
+                                                    {userMap[comment.user_id] || "Usuario Desconocido"}
+                                                    <Typography
+                                                        component="span"
+                                                        variant="caption"
+                                                        color="text.secondary"
+                                                        sx={{ ml: 1 }}
+                                                    >
+                                                        {isValid(new Date(comment.created_at)) ? format(new Date(comment.created_at), 'dd/MM/yyyy HH:mm', { locale: es }) : 'Fecha inválida'}
+                                                    </Typography>
                                                 </Typography>
-                                            </Typography>
-                                        }
-                                        secondary={
-                                            <Typography component="span" variant="body2" color="text.primary" sx={{ display: 'block', mt: 0.5 }}>
-                                                {comment.content}
-                                            </Typography>
-                                        }
-                                    />
-                                    {comment.user_id === userId && (
-                                        <IconButton
-                                            edge="end"
-                                            aria-label="delete"
-                                            onClick={() => handleDeleteComment(comment.id)}
-                                            sx={{ ml: 1, color: 'error.main' }}
-                                            size="small"
-                                        >
-                                            <DeleteIcon fontSize="small" />
-                                        </IconButton>
-                                    )}
-                                </ListItem>
-                            </Fade>
-                        ))
+                                            }
+                                            secondary={
+                                                <Typography component="span" variant="body2" color="text.primary" sx={{ display: 'block', mt: 0.5 }}>
+                                                    {comment.content}
+                                                </Typography>
+                                            }
+                                        />
+                                        {comment.user_id === userId && (
+                                            <IconButton
+                                                edge="end"
+                                                aria-label="delete"
+                                                onClick={() => handleDeleteComment(comment.id)}
+                                                sx={{ ml: 1, color: 'error.main' }}
+                                                size="small"
+                                            >
+                                                <DeleteIcon fontSize="small" />
+                                            </IconButton>
+                                        )}
+                                    </ListItem>
+                                </Fade>
+                            ))
                     )}
                 </List>
             </Paper>
