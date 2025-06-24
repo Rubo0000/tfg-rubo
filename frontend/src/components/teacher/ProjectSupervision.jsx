@@ -9,16 +9,35 @@ import {
     Divider,
     Chip,
     Stack,
-    LinearProgress
+    LinearProgress,
+    Skeleton
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { CheckCircle, Schedule, Group } from "@mui/icons-material";
+import { useEffect, useState } from "react";
 
 function ProjectSupervision({ projects }) {
     const theme = useTheme();
     const navigate = useNavigate();
-    console.log(projects);
+    const [loading, setLoading] = useState(true);
+    const [projectStats, setProjectStats] = useState([]);
+
+    useEffect(() => {
+        if (projects && projects.length > 0) {
+            setProjectStats(projects.map(project => ({
+                ...project,
+                progress: project.task_count > 0
+                    ? Math.round((project.completed_tasks / project.task_count) * 100)
+                    : 0,
+                formattedDate: project.last_due_date
+                    ? new Date(project.last_due_date).toLocaleDateString()
+                    : 'Sin fecha de entrega'
+            })));
+            setLoading(false);
+        }
+    }, [projects]);
+
     const getStatusColor = (status) => {
         switch (status) {
             case 'active': return 'success';
@@ -28,6 +47,18 @@ function ProjectSupervision({ projects }) {
         }
     };
 
+    if (loading) {
+        return (
+            <Grid container spacing={3}>
+                {[1, 2, 3].map((item) => (
+                    <Grid item xs={12} sm={6} md={4} key={item}>
+                        <Skeleton variant="rectangular" width="100%" height={300} />
+                    </Grid>
+                ))}
+            </Grid>
+        );
+    }
+
     return (
         <Box>
             <Typography variant="h6" color="text.secondary" sx={{ mb: 4 }}>
@@ -35,7 +66,7 @@ function ProjectSupervision({ projects }) {
             </Typography>
 
             <Grid container spacing={3}>
-                {projects.map((project) => (
+                {projectStats.map((project) => (
                     <Grid item xs={12} sm={6} md={4} key={project.id}>
                         <Paper
                             component={motion.div}
@@ -87,13 +118,13 @@ function ProjectSupervision({ projects }) {
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <Group fontSize="small" color="action" />
                                     <Typography variant="caption">
-                                        {project.student_count || 0} estudiantes
+                                        {project.member_count || 0} miembros
                                     </Typography>
                                 </Stack>
                                 <Stack direction="row" alignItems="center" spacing={1}>
                                     <Schedule fontSize="small" color="action" />
                                     <Typography variant="caption">
-                                        {new Date(project.due_date).toLocaleDateString()}
+                                        {project.formattedDate}
                                     </Typography>
                                 </Stack>
                             </Stack>
@@ -105,9 +136,21 @@ function ProjectSupervision({ projects }) {
                                 <LinearProgress
                                     variant="determinate"
                                     value={project.progress || 0}
-                                    sx={{ height: 8, borderRadius: 4 }}
-                                    color={project.progress >= 80 ? 'success' : project.progress >= 50 ? 'primary' : 'warning'}
+                                    sx={{
+                                        height: 8,
+                                        borderRadius: 4,
+                                        backgroundColor: theme.palette.grey[300],
+                                        '& .MuiLinearProgress-bar': {
+                                            backgroundColor:
+                                                project.progress >= 80 ? theme.palette.success.main :
+                                                    project.progress >= 50 ? theme.palette.primary.main :
+                                                        theme.palette.warning.main
+                                        }
+                                    }}
                                 />
+                                <Typography variant="caption" color="text.secondary">
+                                    {project.completed_tasks || 0} de {project.task_count || 0} tareas completadas
+                                </Typography>
                             </Box>
 
                             <Box

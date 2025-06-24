@@ -38,7 +38,18 @@ async def create_project(project: ProjectIn):
 
 @router.get("/projects/all")
 async def get_all_projects():
-    query = select(Project)
+    query = """
+    SELECT 
+        p.*,
+        COUNT(DISTINCT pu.user_id) as member_count,
+        COUNT(t.id) as task_count,
+        SUM(CASE WHEN t.status = 'finalizada' THEN 1 ELSE 0 END) as completed_tasks,
+        MAX(t.due_date) as last_due_date
+    FROM projects p
+    LEFT JOIN project_users pu ON p.id = pu.project_id
+    LEFT JOIN tasks t ON p.id = t.project_id
+    GROUP BY p.id
+    """
     return await database.fetch_all(query)
 
 @router.get("/projects/{project_id}")
