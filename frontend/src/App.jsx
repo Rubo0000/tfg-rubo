@@ -9,6 +9,7 @@ import TeacherDashboard from "./pages/TeacherDashboard";
 import StudentManagement from "./components/teacher/StudentManagement";
 import ProjectSupervision from "./components/teacher/ProjectSupervision";
 import GlobalStats from "./components/teacher/GlobalStats";
+import StudentDetail from "./components/teacher/StudentDetail";
 
 function App() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -26,6 +27,7 @@ function App() {
           <Route path="/teacher/students" element={<StudentManagement />} />
           <Route path="/teacher/projects" element={<ProjectSupervision />} />
           <Route path="/teacher/stats" element={<GlobalStats />} />
+          <Route path="/teacher/students/:id" element={<StudentDetail />} />
         </>
       ) : (
         <Route path="/dashboard" element={<Dashboard />} />
