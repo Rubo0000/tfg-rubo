@@ -89,13 +89,14 @@ function AppHeader({ onOpenProfile }) {
                 background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
                 backdropFilter: "blur(20px)",
                 borderBottom: `1px solid ${alpha(theme.palette.common.white, 0.1)}`,
+                borderRadius: 0,
             }}
         >
             <Toolbar sx={{
                 display: "flex",
                 justifyContent: "space-between",
                 py: 1,
-                minHeight: 72
+                minHeight: 72,
             }}>
                 {/* Left Section */}
                 <Box sx={{ display: "flex", alignItems: "center", gap: 3 }}>
