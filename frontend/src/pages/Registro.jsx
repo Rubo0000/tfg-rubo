@@ -1,4 +1,3 @@
-// Registro.jsx
 import {
   Box,
   Button,
@@ -19,6 +18,8 @@ import LockIcon from "@mui/icons-material/Lock";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
+import CloseIcon from "@mui/icons-material/Close";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import AuthHeader from "../components/auth/AuthHeader";
@@ -45,6 +46,13 @@ export default function Registro() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [passwordRequirements, setPasswordRequirements] = useState({
+    length: false,
+    uppercase: false,
+    lowercase: false,
+    number: false,
+    specialChar: false,
+  });
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -64,17 +72,38 @@ export default function Registro() {
 
     const reader = new FileReader();
     reader.onloadend = () => {
-      setForm(prev => ({ ...prev, avatar: reader.result }));
+      setForm((prev) => ({ ...prev, avatar: reader.result }));
     };
     reader.readAsDataURL(file);
   };
 
+  const handleRemoveAvatar = () => {
+    setForm((prev) => ({ ...prev, avatar: "" }));
+  };
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    if (e.target.name === "confirmPassword" || e.target.name === "password") {
-      if (e.target.name === "confirmPassword" && e.target.value !== form.password) {
+    const { name, value } = e.target;
+    setForm({ ...form, [name]: value });
+
+    if (name === "password") {
+      const requirements = {
+        length: value.length >= 8,
+        uppercase: /[A-Z]/.test(value),
+        lowercase: /[a-z]/.test(value),
+        number: /[0-9]/.test(value),
+        specialChar: /[!@#$%^&*(),.?":{}|<>]/.test(value),
+      };
+      setPasswordRequirements(requirements);
+    }
+
+    if (name === "confirmPassword" || name === "password") {
+      if (name === "confirmPassword" && value !== form.password) {
         setPasswordError("Las contraseñas no coinciden");
-      } else if (e.target.name === "password" && e.target.value !== form.confirmPassword && form.confirmPassword !== "") {
+      } else if (
+        name === "password" &&
+        value !== form.confirmPassword &&
+        form.confirmPassword !== ""
+      ) {
         setPasswordError("Las contraseñas no coinciden");
       } else {
         setPasswordError("");
@@ -86,19 +115,21 @@ export default function Registro() {
     const validateForm = () => {
       const { nombre, email, password, confirmPassword } = form;
 
-      const allFieldsFilled = nombre.trim() !== "" &&
+      const allFieldsFilled =
+        nombre.trim() !== "" &&
         email.trim() !== "" &&
         password.trim() !== "" &&
         confirmPassword.trim() !== "";
 
       const passwordsMatch = password === confirmPassword && passwordError === "";
       const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const isPasswordValid = Object.values(passwordRequirements).every(Boolean);
 
-      return allFieldsFilled && passwordsMatch && isEmailValid;
+      return allFieldsFilled && passwordsMatch && isEmailValid && isPasswordValid;
     };
 
     setIsFormValid(validateForm());
-  }, [form, passwordError]);
+  }, [form, passwordError, passwordRequirements]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -123,7 +154,6 @@ export default function Registro() {
           role: form.role,
           avatar: form.avatar || undefined,
         }),
-
       });
 
       if (res.ok) {
@@ -153,13 +183,50 @@ export default function Registro() {
       <AuthFormContainer
         avatarIcon={
           form.avatar ? (
-            <img
-              src={form.avatar}
-              alt="Avatar de usuario"
-              style={{ width: "100%", height: "100%", borderRadius: "50%" }}
-            />
+            <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
+              <img
+                src={form.avatar}
+                alt="Avatar de usuario"
+                style={{ width: "100%", height: "100%", borderRadius: "50%" }}
+              />
+              <IconButton
+                onClick={handleRemoveAvatar}
+                sx={{
+                  position: "absolute",
+                  top: 0,
+                  right: 0,
+                  backgroundColor: "rgba(0,0,0,0.5)",
+                  color: "white",
+                  "&:hover": {
+                    backgroundColor: "rgba(0,0,0,0.7)",
+                  },
+                }}
+              >
+                <CloseIcon fontSize="small" />
+              </IconButton>
+            </Box>
           ) : (
-            <PersonAddAltIcon sx={{ fontSize: 36 }} />
+            <Box
+              component="label"
+              htmlFor="avatar-upload"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "100%",
+                height: "100%",
+                cursor: "pointer",
+              }}
+            >
+              <AddAPhotoIcon sx={{ fontSize: 36, color: "white" }} />
+              <input
+                id="avatar-upload"
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleAvatarUpload}
+              />
+            </Box>
           )
         }
         avatarBgColor="#1976d2"
@@ -180,7 +247,9 @@ export default function Registro() {
             onChange={handleChange}
             required
             InputProps={{
-              startAdornment: <AccountCircleIcon sx={{ mr: 1, color: 'action.active' }} />,
+              startAdornment: (
+                <AccountCircleIcon sx={{ mr: 1, color: "action.active" }} />
+              ),
             }}
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
@@ -194,7 +263,9 @@ export default function Registro() {
             onChange={handleChange}
             required
             InputProps={{
-              startAdornment: <EmailIcon sx={{ mr: 1, color: 'action.active' }} />,
+              startAdornment: (
+                <EmailIcon sx={{ mr: 1, color: "action.active" }} />
+              ),
             }}
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
@@ -208,7 +279,9 @@ export default function Registro() {
             onChange={handleChange}
             required
             InputProps={{
-              startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
+              startAdornment: (
+                <LockIcon sx={{ mr: 1, color: "action.active" }} />
+              ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
@@ -225,6 +298,62 @@ export default function Registro() {
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
 
+          <Typography variant="caption" component="div" sx={{ mt: -2, mb: 1 }}>
+            Requisitos de contraseña:
+            <Box component="ul" sx={{ pl: 2, mt: 0.5, mb: 0 }}>
+              <Box
+                component="li"
+                sx={{
+                  color: passwordRequirements.length
+                    ? "success.main"
+                    : "text.secondary",
+                }}
+              >
+                Mínimo 8 caracteres
+              </Box>
+              <Box
+                component="li"
+                sx={{
+                  color: passwordRequirements.uppercase
+                    ? "success.main"
+                    : "text.secondary",
+                }}
+              >
+                Al menos una mayúscula
+              </Box>
+              <Box
+                component="li"
+                sx={{
+                  color: passwordRequirements.lowercase
+                    ? "success.main"
+                    : "text.secondary",
+                }}
+              >
+                Al menos una minúscula
+              </Box>
+              <Box
+                component="li"
+                sx={{
+                  color: passwordRequirements.number
+                    ? "success.main"
+                    : "text.secondary",
+                }}
+              >
+                Al menos un número
+              </Box>
+              <Box
+                component="li"
+                sx={{
+                  color: passwordRequirements.specialChar
+                    ? "success.main"
+                    : "text.secondary",
+                }}
+              >
+                Al menos un carácter especial (!@#$%^&* etc.)
+              </Box>
+            </Box>
+          </Typography>
+
           <TextField
             label="Confirmar contraseña"
             name="confirmPassword"
@@ -236,7 +365,9 @@ export default function Registro() {
             error={!!passwordError}
             helperText={passwordError}
             InputProps={{
-              startAdornment: <LockIcon sx={{ mr: 1, color: 'action.active' }} />,
+              startAdornment: (
+                <LockIcon sx={{ mr: 1, color: "action.active" }} />
+              ),
               endAdornment: (
                 <InputAdornment position="end">
                   <IconButton
@@ -253,7 +384,11 @@ export default function Registro() {
             sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
           />
 
-          <FormControl fullWidth variant="outlined" sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}>
+          <FormControl
+            fullWidth
+            variant="outlined"
+            sx={{ "& .MuiOutlinedInput-root": { borderRadius: 5 } }}
+          >
             <InputLabel id="role-label">Tipo de usuario</InputLabel>
             <Select
               labelId="role-label"
@@ -266,7 +401,7 @@ export default function Registro() {
                 PaperProps: {
                   sx: {
                     borderRadius: 4,
-                    boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.1)',
+                    boxShadow: "0px 4px 20px rgba(0, 0, 0, 0.1)",
                     marginTop: 1,
                   },
                 },
@@ -278,12 +413,12 @@ export default function Registro() {
                   borderRadius: 2,
                   mx: 1,
                   my: 0.5,
-                  '&:hover': {
-                    backgroundColor: '#e3f2fd',
+                  "&:hover": {
+                    backgroundColor: "#e3f2fd",
                   },
-                  '&.Mui-selected': {
-                    backgroundColor: '#bbdefb',
-                    fontWeight: 'bold',
+                  "&.Mui-selected": {
+                    backgroundColor: "#bbdefb",
+                    fontWeight: "bold",
                   },
                 }}
               >
@@ -295,12 +430,12 @@ export default function Registro() {
                   borderRadius: 2,
                   mx: 1,
                   my: 0.5,
-                  '&:hover': {
-                    backgroundColor: '#e3f2fd',
+                  "&:hover": {
+                    backgroundColor: "#e3f2fd",
                   },
-                  '&.Mui-selected': {
-                    backgroundColor: '#bbdefb',
-                    fontWeight: 'bold',
+                  "&.Mui-selected": {
+                    backgroundColor: "#bbdefb",
+                    fontWeight: "bold",
                   },
                 }}
               >
@@ -308,41 +443,6 @@ export default function Registro() {
               </MenuItem>
             </Select>
           </FormControl>
-          <Box sx={{ textAlign: 'center' }}>
-            <Typography variant="subtitle1" sx={{ mb: 1 }}>
-              Foto de perfil (opcional)
-            </Typography>
-
-            <Button
-              variant="outlined"
-              component="label"
-              sx={{ borderRadius: 5, textTransform: "none", mb: 2 }}
-            >
-              Seleccionar imagen
-              <input
-                type="file"
-                accept="image/*"
-                hidden
-                onChange={handleAvatarUpload}
-              />
-            </Button>
-
-            {form.avatar && (
-              <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 1 }}>
-
-                <Button
-                  size="small"
-                  variant="text"
-                  color="error"
-                  onClick={() => setForm(prev => ({ ...prev, avatar: "" }))}
-                  sx={{ textTransform: "none", fontSize: "0.85rem" }}
-                >
-                  Quitar imagen
-                </Button>
-              </Box>
-            )}
-          </Box>
-
 
           <Typography variant="body2" color="text.secondary" align="center">
             Al registrarte, aceptas nuestros{" "}
@@ -366,13 +466,22 @@ export default function Registro() {
               "&:hover": {
                 background: "linear-gradient(to right, #9face6, #74ebd5)",
               },
-              position: 'relative',
+              position: "relative",
             }}
           >
-            {loading ? <CircularProgress size={24} sx={{ color: '#000' }} /> : "REGISTRARSE"}
+            {loading ? (
+              <CircularProgress size={24} sx={{ color: "#000" }} />
+            ) : (
+              "REGISTRARSE"
+            )}
           </Button>
 
-          <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
+          <Typography
+            variant="body2"
+            color="text.secondary"
+            align="center"
+            sx={{ mt: 2 }}
+          >
             ¿Ya tienes una cuenta?{" "}
             <Link href="/login" underline="hover">
               Inicia sesión aquí

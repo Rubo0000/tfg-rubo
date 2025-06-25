@@ -42,6 +42,7 @@ function AppHeader({ onOpenProfile }) {
     const userName = localStorage.getItem("userName") || "Usuario";
     const userRole = localStorage.getItem("userRole") || "student";
 
+    console.log("useravatar", localStorage.getItem("userAvatar"));
     const handleLogout = async () => {
         await logoutUser();
         setLogoutMsgOpen(true);
@@ -116,7 +117,7 @@ function AppHeader({ onOpenProfile }) {
                                 backdropFilter: "blur(10px)"
                             }}
                         >
-                            {userName[0]?.toUpperCase()}
+                            {localStorage.getItem("userAvatar")}
                         </Avatar>
                     </motion.div>
 

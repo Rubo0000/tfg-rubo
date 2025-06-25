@@ -84,6 +84,7 @@ export default function Login() {
         localStorage.setItem("userRole", data.role);
         localStorage.setItem("userName", data.name);
         localStorage.setItem("userEmail", data.email);
+        localStorage.setItem("userAvatar", data.avatar);
 
         setSnackbarMessage("Inicio de sesión exitoso");
         setSnackbarSeverity("success");
