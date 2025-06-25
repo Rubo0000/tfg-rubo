@@ -79,63 +79,74 @@ function TeacherDashboard() {
         <>
             <AppHeader />
             <Box sx={{ px: 4, py: 6 }}>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 3, mb: 4 }}>
-                    <Avatar sx={{ width: 80, height: 80, bgcolor: theme.palette.primary.main }}>
-                        {localStorage.getItem('userName')?.charAt(0)}
-                    </Avatar>
-                    <Box>
-                        <Typography variant="h4" fontWeight="bold">
-                            Bienvenido, {localStorage.getItem('userName')}
-                        </Typography>
-                        <Typography variant="subtitle1" color="text.secondary">
-                            {new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
-                        </Typography>
-                    </Box>
+                {/* Sección de bienvenida centrada */}
+                <Box sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    textAlign: 'center',
+                    mb: 4
+                }}>
+                    <Typography variant="h4" fontWeight="bold" gutterBottom>
+                        Bienvenido, {localStorage.getItem('userName')}
+                    </Typography>
+                    <Typography variant="subtitle1" color="text.secondary" gutterBottom>
+                        {new Date().toLocaleDateString('es-ES', {
+                            weekday: 'long',
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        })}
+                    </Typography>
                 </Box>
 
-                <Grid container spacing={3} sx={{ mb: 4 }}>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 3, borderRadius: 3, bgcolor: theme.palette.primary.light }}>
-                            <Typography variant="subtitle2" color="primary.contrastText">
-                                Proyectos Activos
-                            </Typography>
-                            <Typography variant="h4" color="primary.contrastText">
-                                {stats?.total_projects || 0}
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 3, borderRadius: 3, bgcolor: theme.palette.secondary.light }}>
-                            <Typography variant="subtitle2" color="secondary.contrastText">
-                                Estudiantes
-                            </Typography>
-                            <Typography variant="h4" color="secondary.contrastText">
-                                {students.length}
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 3, borderRadius: 3, bgcolor: theme.palette.success.light }}>
-                            <Typography variant="subtitle2" color="success.contrastText">
-                                Tareas Completadas
-                            </Typography>
-                            <Typography variant="h4" color="success.contrastText">
-                                {stats?.completed_tasks || 0}
-                            </Typography>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={3}>
-                        <Paper sx={{ p: 3, borderRadius: 3, bgcolor: theme.palette.warning.light }}>
-                            <Typography variant="subtitle2" color="warning.contrastText">
-                                Progreso Promedio
-                            </Typography>
-                            <Typography variant="h4" color="warning.contrastText">
-                                {stats?.average_progress || 0}%
-                            </Typography>
-                        </Paper>
-                    </Grid>
+                <Grid container spacing={3} sx={{
+                    mb: 4,
+                    justifyContent: 'center',
+                    maxWidth: '800px',
+                    mx: 'auto'
+                }}>
+                    {[
+                        {
+                            title: "Proyectos Activos",
+                            value: stats?.total_projects || 0,
+                            color: "primary"
+                        },
+                        {
+                            title: "Estudiantes",
+                            value: students.length,
+                            color: "secondary"
+                        },
+                        {
+                            title: "Tareas Completadas",
+                            value: stats?.completed_tasks || 0,
+                            color: "success"
+                        },
+                        {
+                            title: "Progreso Promedio",
+                            value: `${stats?.average_progress || 0}%`,
+                            color: "warning"
+                        }
+                    ].map((item, index) => (
+                        <Grid item xs={12} sm={6} md={3} key={index}>
+                            <Paper sx={{
+                                p: 2,
+                                borderRadius: 2,
+                                bgcolor: theme.palette[item.color].light,
+                                textAlign: 'center'
+                            }}>
+                                <Typography variant="subtitle2" color={`${item.color}.contrastText`} gutterBottom>
+                                    {item.title}
+                                </Typography>
+                                <Typography variant="h4" color={`${item.color}.contrastText`} fontWeight="bold">
+                                    {item.value}
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                    ))}
                 </Grid>
 
+                {/* Tabs y contenido (se mantienen como antes) */}
                 <Tabs
                     value={tabValue}
                     onChange={handleTabChange}
