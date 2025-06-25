@@ -157,10 +157,11 @@ export default function Registro() {
       });
 
       if (res.ok) {
-        setSnackbarMessage("Registro exitoso");
+        // Después de registro exitoso, redirigir a login
+        setSnackbarMessage("Registro exitoso. Redirigiendo a login...");
         setSnackbarSeverity("success");
         setOpenSnackbar(true);
-        setTimeout(() => navigate("/"), 2500);
+        setTimeout(() => navigate("/login"), 2500);
       } else {
         const error = await res.json();
         setSnackbarMessage(error.detail || "Error al registrarse");

@@ -41,6 +41,8 @@ function AppHeader({ onOpenProfile }) {
 
     const userName = localStorage.getItem("userName") || "Usuario";
     const userRole = localStorage.getItem("userRole") || "student";
+    const userAvatar = localStorage.getItem("userAvatar") || "";
+    const isImageUrl = userAvatar.startsWith("data:image");
 
     console.log("useravatar", localStorage.getItem("userAvatar"));
     const handleLogout = async () => {
@@ -107,17 +109,22 @@ function AppHeader({ onOpenProfile }) {
                     >
                         <Avatar
                             sx={{
-                                bgcolor: alpha(theme.palette.common.white, 0.2),
+                                bgcolor: isImageUrl
+                                    ? 'transparent'
+                                    : alpha(theme.palette.common.white, 0.2),
                                 color: "white",
                                 width: 48,
                                 height: 48,
                                 fontSize: "1.2rem",
                                 fontWeight: "bold",
                                 border: `2px solid ${alpha(theme.palette.common.white, 0.3)}`,
-                                backdropFilter: "blur(10px)"
+                                backdropFilter: "blur(10px)",
+                                backgroundImage: isImageUrl ? `url(${userAvatar})` : 'none',
+                                backgroundSize: 'cover',
+                                backgroundPosition: 'center'
                             }}
                         >
-                            {localStorage.getItem("userAvatar")}
+                            {userAvatar}
                         </Avatar>
                     </motion.div>
 

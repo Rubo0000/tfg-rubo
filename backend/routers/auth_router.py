@@ -22,13 +22,13 @@ async def login(data: LoginInput):
     
     token = create_access_token(data={"sub": user.email})
     return {
-            "access_token": token,
-            "user_id":user.id,
-            "role":user.role,
-            "name":user.name,
-            "email":user.email,
-            "avatar": user.avatar   
-        }
+        "access_token": token,
+        "user_id": user.id,
+        "role": user.role,
+        "name": user.name,
+        "email": user.email,
+        "avatar": user.avatar if user.avatar else ""
+    }
 
 @router.post("/logout")
 async def logout():

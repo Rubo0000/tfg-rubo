@@ -78,13 +78,21 @@ export default function Login() {
 
       if (res.ok) {
         const data = await res.json();
-        console.log(data);
+        // Guardar datos del usuario en localStorage
         localStorage.setItem("token", data.access_token);
         localStorage.setItem("userId", data.user_id);
         localStorage.setItem("userRole", data.role);
         localStorage.setItem("userName", data.name);
         localStorage.setItem("userEmail", data.email);
-        localStorage.setItem("userAvatar", data.avatar);
+
+        // Guardar avatar solo si existe
+        if (data.avatar) {
+          localStorage.setItem("userAvatar", data.avatar);
+        } else {
+          // Si no hay avatar, guardar las iniciales del nombre
+          const initials = data.name.split(' ').map(n => n[0]).join('').toUpperCase();
+          localStorage.setItem("userAvatar", initials);
+        }
 
         setSnackbarMessage("Inicio de sesión exitoso");
         setSnackbarSeverity("success");
