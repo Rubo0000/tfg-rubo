@@ -48,6 +48,7 @@ const ProjectMembers = ({ allUsers, projectUsers, onAddUser, onRemoveUser }) => 
             sx={{
                 p: 3,
                 mt: 4,
+                mb: 5,
                 borderRadius: 3,
                 border: `1px solid ${theme.palette.divider}`,
                 backgroundColor: 'background.paper'
